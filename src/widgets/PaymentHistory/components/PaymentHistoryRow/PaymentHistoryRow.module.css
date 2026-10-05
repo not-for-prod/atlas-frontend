@@ -1,0 +1,117 @@
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr) minmax(0, auto);
+  align-items: center;
+  gap: var(--app-space-md);
+  padding-block: 14px;
+}
+
+.description {
+  min-width: 0;
+}
+
+.title,
+.detail,
+.status,
+.failed,
+.amount,
+.incoming {
+  margin: 0;
+}
+
+.title {
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.detail,
+.status,
+.failed,
+.time {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--app-muted);
+}
+
+.detail {
+  margin-top: 3px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.status,
+.failed {
+  margin-top: 3px;
+}
+
+.failed {
+  color: var(--app-danger);
+}
+
+.summary {
+  max-width: 220px;
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+.amount,
+.incoming {
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.4;
+  overflow-wrap: anywhere;
+}
+
+.incoming {
+  color: #16835c;
+}
+
+.time {
+  overflow-wrap: anywhere;
+  display: block;
+  margin-top: 3px;
+}
+
+@media (width < 48em) {
+  .row {
+    position: relative;
+    gap: 10px;
+  }
+
+  .summary {
+    max-width: 128px;
+  }
+
+  .amount,
+  .incoming {
+    font-size: 14px;
+  }
+
+  .title {
+    font-size: 14px;
+  }
+}
+
+.open {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  border-radius: 12px;
+  background: transparent;
+  cursor: pointer;
+  z-index: 1;
+}
+
+.open:hover {
+  background: var(--app-orb-dark);
+}
+
+.open:focus-visible {
+  outline: 2px solid var(--app-ink);
+  outline-offset: 2px;
+}

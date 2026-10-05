@@ -1,0 +1,82 @@
+.summary {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: var(--app-space-md);
+  padding-block: var(--app-space-lg) var(--app-space-xl);
+  text-align: center;
+}
+
+.amount {
+  margin: 4px 0 0;
+  font-size: clamp(22px, 5vw, 30px);
+  font-weight: 700;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+  max-width: 100%;
+}
+
+.amount[data-completed='true'] {
+  color: #16835c;
+}
+
+.status {
+  display: inline-block;
+  padding: 6px 10px;
+  border-radius: 12px;
+  background: #f0f1f3;
+  color: #505663;
+  font-size: 12px;
+  font-weight: 600;
+  line-height: 1.5;
+  text-align: center;
+}
+
+.details {
+  margin: 0;
+  font-size: 14px;
+}
+
+.details > div {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: var(--app-space-sm) var(--app-space-lg);
+  align-items: center;
+  padding-block: var(--app-space-md);
+  border-top: 1px solid var(--app-line);
+}
+
+.details dt {
+  color: var(--app-muted);
+}
+
+.details dd {
+  margin: 0;
+  text-align: right;
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.details > .full {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+.full dd {
+  text-align: left;
+}
+
+.status[data-status='PAYMENT_STATUS_COMPLETED'] {
+  background: #e7f5ee;
+  color: #16734f;
+}
+
+.status[data-status='PAYMENT_STATUS_PENDING'],
+.status[data-status='PAYMENT_STATUS_INSPECTION'] {
+  background: #fff3d6;
+  color: #805700;
+}
+
+.status[data-status='PAYMENT_STATUS_FAILED'] {
+  background: #ffeded;
+  color: #ad3030;
+}

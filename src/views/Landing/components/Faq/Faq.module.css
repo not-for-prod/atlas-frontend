@@ -1,0 +1,30 @@
+.section {
+  padding-top: var(--app-section-space);
+  scroll-margin-top: 24px;
+}
+
+.section h2 {
+  margin: 0 0 12px;
+  font-size: clamp(28px, 3vw, 36px);
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.description {
+  margin: 0 0 24px;
+  font-size: 15px;
+  color: var(--app-muted);
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+@media (width < 54em) {
+  .section {
+    padding-top: var(--app-section-space);
+  }
+}

@@ -1,0 +1,102 @@
+@font-face {
+  font-family: Onest;
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/onest-cyrillic.woff2') format('woff2');
+  unicode-range: U+0301, U+0400-045F, U+0490-0491, U+04B0-04B1, U+2116;
+}
+
+@font-face {
+  font-family: Onest;
+  font-style: normal;
+  font-weight: 400 800;
+  font-display: swap;
+  src: url('/fonts/onest-latin.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  --app-paper: #f2f2ee;
+  --app-card: #fff;
+  --app-ink: #0b0b0b;
+  --app-muted: #62625b;
+  --app-line: #e3e3dd;
+  --app-soft: #ecece7;
+  --app-lime: #cbf31a;
+  --app-lime-ink: #1c2600;
+  --app-lime-text: #5e8200;
+  --app-orb-dark: rgb(11 11 11 / 8%);
+  --app-danger: #b3261e;
+  --app-card-ink: #d2d2cb;
+  --app-graphite: #30312d;
+  --app-orb: rgb(203 243 26 / 22%);
+  --app-metal-hi: #f4f4ef;
+  --app-metal-lo: #a9a9a1;
+  --app-sheen: rgb(255 255 255 / 34%);
+  --app-sheen-soft: rgb(255 255 255 / 8%);
+  --app-card-shadow: 0 24px 40px -24px rgb(11 11 11 / 45%);
+  --app-radius: 28px;
+  --app-space-sm: 8px;
+  --app-space-md: 12px;
+  --app-space-lg: 16px;
+  --app-space-xl: 24px;
+  --app-page-max-width: 1120px;
+  --app-page-gutter: 24px;
+  --app-panel-padding: 20px;
+  --app-section-space: 56px;
+}
+
+html {
+  scrollbar-gutter: stable;
+}
+
+body {
+  --mantine-color-dimmed: var(--app-muted);
+  --mantine-color-text: var(--app-ink);
+
+  margin: 0;
+  background: var(--app-paper);
+  color: var(--app-ink);
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button,
+a,
+input {
+  -webkit-tap-highlight-color: transparent;
+}
+
+:focus-visible {
+  outline: 3px solid var(--app-ink);
+  outline-offset: 4px;
+}
+
+::selection {
+  background: var(--app-lime);
+  color: var(--app-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    scroll-behavior: auto !important;
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}
+
+@media (width < 54em) {
+  :root {
+    --app-page-gutter: 16px;
+    --app-panel-padding: 16px;
+    --app-section-space: 36px;
+  }
+}

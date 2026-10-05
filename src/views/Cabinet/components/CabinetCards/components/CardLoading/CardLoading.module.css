@@ -1,0 +1,87 @@
+.card {
+  position: relative;
+  flex: 0 0 var(--carousel-card-width);
+  aspect-ratio: 85.6 / 54;
+  border-radius: var(--card-visual-radius);
+  overflow: hidden;
+  background: var(--mantine-color-gray-1);
+  scroll-snap-align: start;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(110deg, transparent 25%, var(--app-sheen) 50%, transparent 75%);
+  transform: translateX(-100%);
+  animation: shimmer 1.8s ease-in-out infinite;
+}
+
+.chip,
+.name,
+.number span,
+.bottom span {
+  display: block;
+  border-radius: 6px;
+  background: var(--mantine-color-gray-3);
+}
+
+.chip {
+  position: absolute;
+  top: 16%;
+  left: 8%;
+  width: 14%;
+  height: 17%;
+}
+
+.name {
+  position: absolute;
+  top: 13%;
+  right: 8%;
+  width: 17%;
+  height: 6%;
+}
+
+.number {
+  position: absolute;
+  top: 57%;
+  left: 8%;
+  right: 8%;
+  display: flex;
+  gap: 7px;
+  height: 7%;
+}
+
+.number span {
+  flex: 1;
+}
+
+.bottom {
+  position: absolute;
+  bottom: 13%;
+  left: 8%;
+  display: flex;
+  gap: 8px;
+  width: 34%;
+  height: 6%;
+}
+
+.bottom span:first-child {
+  flex: 2;
+}
+
+.bottom span:last-child {
+  flex: 1;
+}
+
+@keyframes shimmer {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card::after {
+    animation: none;
+  }
+}

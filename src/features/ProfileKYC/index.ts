@@ -1,0 +1,1 @@
+export { ProfileKYC } from './ProfileKYC';

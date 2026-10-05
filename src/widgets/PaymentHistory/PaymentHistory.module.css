@@ -1,0 +1,25 @@
+.panel {
+  padding: var(--app-panel-padding);
+  background: var(--app-card);
+  border: 1px solid var(--app-line);
+  border-radius: var(--app-radius);
+  min-width: 0;
+}
+
+.date {
+  margin-bottom: var(--app-space-sm);
+  color: var(--app-muted);
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.5;
+}
+
+.day + .day {
+  margin-top: var(--app-space-md);
+}
+
+.list {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}

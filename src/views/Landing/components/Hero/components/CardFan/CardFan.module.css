@@ -1,0 +1,57 @@
+.fan {
+  position: relative;
+  width: 100%;
+  max-width: 460px;
+  aspect-ratio: 1.08;
+  margin: 0 auto;
+}
+
+.fan > div {
+  position: absolute;
+  width: 78%;
+  transition: transform 300ms ease;
+}
+
+.travel {
+  left: 0;
+  top: 25%;
+  transform: rotate(-14deg);
+}
+
+.premium {
+  left: 21%;
+  top: 3%;
+  transform: rotate(10deg);
+}
+
+.subscriptions {
+  left: 18%;
+  top: 51%;
+  transform: rotate(-5deg);
+}
+
+.fan:hover .travel {
+  transform: translate(-4px, -4px) rotate(-16deg);
+}
+
+.fan:hover .premium {
+  transform: translate(4px, -8px) rotate(12deg);
+}
+
+.fan:hover .subscriptions {
+  transform: translateY(6px) rotate(-3deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fan:hover .travel {
+    transform: rotate(-14deg);
+  }
+
+  .fan:hover .premium {
+    transform: rotate(10deg);
+  }
+
+  .fan:hover .subscriptions {
+    transform: rotate(-5deg);
+  }
+}

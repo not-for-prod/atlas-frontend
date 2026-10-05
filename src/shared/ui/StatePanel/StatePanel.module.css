@@ -1,0 +1,6 @@
+.panel {
+  padding: 24px var(--app-panel-padding);
+  border-radius: var(--app-radius);
+  background: var(--app-card);
+  text-align: center;
+}

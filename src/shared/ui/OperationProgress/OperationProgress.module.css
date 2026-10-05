@@ -1,0 +1,92 @@
+.progress {
+  display: flex;
+  gap: 5px;
+  margin-bottom: var(--app-space-sm);
+}
+
+.segment {
+  flex: 1;
+  height: 6px;
+  border-radius: 5px;
+  background: var(--app-line);
+}
+
+.segment[data-completed] {
+  background: var(--app-lime);
+}
+
+.steps {
+  list-style: none;
+}
+
+.step {
+  position: relative;
+  min-height: 68px;
+  padding-bottom: var(--app-space-lg);
+}
+
+.step:last-child {
+  min-height: auto;
+  padding-bottom: 0;
+}
+
+.step:not(:last-child)::before {
+  position: absolute;
+  top: 36px;
+  bottom: 4px;
+  left: 15px;
+  width: 1px;
+  background: var(--app-line);
+  content: '';
+}
+
+.marker {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: var(--app-soft);
+  color: var(--app-muted);
+  font-size: var(--mantine-font-size-sm);
+}
+
+.step[data-status='completed'] .marker {
+  background: var(--app-lime);
+  color: var(--app-lime-ink);
+}
+
+.step[data-status='current'] .marker {
+  background: var(--app-ink);
+  color: var(--app-card);
+}
+
+.step[data-status='failed'] .marker {
+  background: var(--mantine-color-red-light);
+  color: var(--app-danger);
+}
+
+.stepTitle {
+  padding-top: 2px;
+}
+
+.step[data-status='upcoming'] .stepTitle {
+  color: var(--app-muted);
+}
+
+.progress[data-compact] {
+  margin-bottom: 0;
+}
+
+.progress[data-compact] .segment {
+  height: 5px;
+  background: currentcolor;
+  opacity: 0.25;
+}
+
+.progress[data-compact] .segment[data-completed] {
+  background: var(--app-lime);
+  opacity: 1;
+}

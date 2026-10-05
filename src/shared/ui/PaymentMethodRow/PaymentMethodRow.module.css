@@ -1,0 +1,96 @@
+.row {
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px minmax(0, 1fr) auto;
+  align-items: center;
+  gap: var(--app-space-lg);
+  padding: var(--app-panel-padding);
+}
+
+.item + .item {
+  border-top: 1px solid var(--app-line);
+}
+
+.item:first-child,
+.item:first-child .row {
+  border-start-start-radius: var(--app-radius);
+  border-start-end-radius: var(--app-radius);
+}
+
+.item:last-child,
+.item:last-child .row {
+  border-end-start-radius: var(--app-radius);
+  border-end-end-radius: var(--app-radius);
+}
+
+.select {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  width: 100%;
+  height: 100%;
+  padding: 0;
+  border: 0;
+  border-radius: inherit;
+  background: transparent;
+  cursor: pointer;
+}
+
+.select:focus-visible {
+  outline: 2px solid var(--app-ink);
+  outline-offset: -4px;
+}
+
+.select:disabled {
+  cursor: wait;
+}
+
+.select:hover:not(:disabled) {
+  background: var(--app-orb-dark);
+}
+
+.icon {
+  display: grid;
+  place-items: center;
+  width: 48px;
+  height: 48px;
+  border-radius: 16px;
+  background: var(--app-paper);
+  color: var(--app-ink);
+}
+
+.content {
+  min-width: 0;
+}
+
+.action {
+  justify-self: end;
+}
+
+.details {
+  min-width: 0;
+  padding: 0 var(--app-panel-padding) var(--app-panel-padding);
+}
+
+.details:empty {
+  display: none;
+}
+
+@media (width < 48em) {
+  .row {
+    grid-template-columns: 40px minmax(0, 1fr) auto;
+    gap: var(--app-space-md);
+  }
+
+  .icon {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+    align-self: start;
+  }
+
+  .row:not(:has(.select)) .action {
+    grid-column: 2 / -1;
+    justify-self: start;
+  }
+}

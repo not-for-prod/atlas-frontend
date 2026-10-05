@@ -1,0 +1,137 @@
+.main {
+  margin-bottom: 72px;
+  display: grid;
+  grid-template-columns: 0.95fr 1.05fr;
+  min-height: 620px;
+  outline: 1px solid var(--app-line);
+  outline-offset: -1px;
+  border-radius: var(--app-radius);
+  background: var(--app-card);
+}
+
+.story {
+  display: flex;
+  flex-direction: column;
+}
+
+.eyebrow {
+  color: var(--app-lime);
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.12em;
+  margin: 0 0 40px;
+}
+
+.story h2 {
+  font-size: 48px;
+  line-height: 1.08;
+  letter-spacing: -2px;
+  max-width: 360px;
+  text-wrap: balance;
+}
+
+.description {
+  color: var(--app-card-ink);
+  margin-top: 20px;
+  max-width: 290px;
+  font-size: 15px;
+  line-height: 1.65;
+}
+
+.art {
+  width: 100%;
+  max-width: 322px;
+  margin: 44px auto 32px;
+  transform: rotate(-8deg);
+}
+
+.artNote {
+  color: var(--app-card-ink);
+  font-size: 11px;
+  line-height: 1.6;
+  max-width: 310px;
+  margin-top: auto;
+  opacity: 0.8;
+}
+
+.form {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 44px 48px;
+  min-width: 0;
+}
+
+.formContent {
+  width: 100%;
+  max-width: 392px;
+}
+
+.formEyebrow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--app-muted);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.lock {
+  display: grid;
+  place-items: center;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: var(--app-lime);
+  color: var(--app-ink);
+}
+
+.form h1 {
+  font-size: 36px;
+  line-height: 1.15;
+  letter-spacing: -1.4px;
+}
+
+.selection {
+  padding: 12px 14px;
+  background: var(--app-paper);
+  border-radius: 12px;
+}
+
+.helpLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  align-self: flex-start;
+  margin-top: 8px;
+  font-size: 13px;
+  color: var(--app-muted);
+}
+
+.helpLink:hover {
+  color: var(--app-ink);
+}
+
+@media (width < 54em) {
+  .main {
+    grid-template-columns: minmax(0, 1fr);
+    margin-bottom: 48px;
+    min-height: 0;
+  }
+
+  .story {
+    display: none;
+  }
+
+  .form {
+    padding: 32px 24px;
+    min-height: 480px;
+  }
+
+  .form h1 {
+    font-size: 30px;
+    letter-spacing: -1px;
+  }
+}

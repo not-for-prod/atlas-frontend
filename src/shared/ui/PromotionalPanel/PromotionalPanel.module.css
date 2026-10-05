@@ -1,0 +1,13 @@
+.panel {
+  background: var(--app-ink);
+  color: var(--app-card);
+  border-radius: var(--app-radius);
+  padding: clamp(28px, 3.5vw, 44px);
+  overflow: hidden;
+}
+
+@media (width < 54em) {
+  .panel {
+    padding: 24px 20px;
+  }
+}

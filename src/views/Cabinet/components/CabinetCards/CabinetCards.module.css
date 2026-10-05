@@ -1,0 +1,63 @@
+.track {
+  --card-visual-radius: 10px;
+  --carousel-card-width: 280px;
+
+  display: flex;
+  align-items: stretch;
+  gap: var(--app-space-lg);
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  padding: 4px 4px 16px;
+}
+
+.card {
+  flex: 0 0 var(--carousel-card-width);
+  scroll-snap-align: start;
+  border-radius: var(--card-visual-radius);
+}
+
+.issue {
+  flex: 0 0 240px;
+  height: auto;
+  min-height: 170px;
+  border-style: dashed;
+  border-radius: var(--card-visual-radius);
+  background: transparent;
+}
+
+.card:focus-visible {
+  outline: 2px solid var(--app-ink);
+  outline-offset: 2px;
+}
+
+@media (width < 48em) {
+  .track {
+    --carousel-card-width: 260px;
+  }
+
+  .issue {
+    flex-basis: 220px;
+  }
+}
+
+.track[data-loading] .issue {
+  flex-basis: var(--carousel-card-width);
+  min-height: 0;
+}
+
+@media (width < 30em) {
+  .loadingLabel {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    overflow: hidden;
+    clip-path: inset(50%);
+    white-space: nowrap;
+  }
+}
+
+.pendingNote {
+  max-width: 170px;
+  white-space: normal;
+  text-align: center;
+}

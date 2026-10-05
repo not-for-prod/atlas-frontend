@@ -1,0 +1,31 @@
+.step {
+  background: var(--app-card);
+  border-radius: var(--app-radius);
+  padding: var(--app-panel-padding);
+}
+
+.number {
+  display: grid;
+  place-items: center;
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: var(--app-lime);
+  color: var(--app-lime-ink);
+  font-weight: 800;
+  margin-bottom: 22px;
+}
+
+.step h3 {
+  font-size: 19px;
+  margin: 0 0 12px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+}
+
+.step p {
+  font-size: 13px;
+  line-height: 1.8;
+  color: var(--app-muted);
+  margin: 0;
+}

@@ -1,0 +1,50 @@
+.provider {
+  height: 64px;
+  padding: 0 18px 0 14px;
+  border: 1px solid var(--app-line);
+  border-radius: 18px;
+  color: var(--app-ink);
+  background: var(--app-card);
+  transition:
+    background-color 160ms ease,
+    border-color 160ms ease;
+}
+
+.provider:disabled {
+  opacity: 0.55;
+}
+
+.provider:hover:not(:disabled) {
+  background: var(--app-paper);
+  border-color: var(--app-ink);
+}
+
+.inner {
+  justify-content: flex-start;
+  gap: 4px;
+}
+
+.label {
+  flex: 1;
+  text-align: left;
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.note {
+  font-size: 12px;
+  line-height: 1.6;
+  color: var(--app-muted);
+  padding: 0 4px;
+}
+
+@media (width < 30em) {
+  .provider {
+    padding-right: 12px;
+    padding-left: 10px;
+  }
+
+  .label {
+    font-size: 14px;
+  }
+}

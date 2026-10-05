@@ -1,0 +1,13 @@
+.methods {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  background: var(--app-card);
+  border: 1px solid var(--app-line);
+  border-radius: var(--app-radius);
+}
+
+.amount {
+  overflow-wrap: anywhere;
+  min-width: 0;
+}

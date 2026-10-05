@@ -1,0 +1,27 @@
+.intents {
+  background: var(--app-paper);
+  padding: 5px;
+  border: 1px solid var(--app-line);
+  border-radius: 999px;
+}
+
+.intent {
+  border: 0;
+  background: transparent;
+  color: var(--app-muted);
+  font-size: 14px;
+  height: 42px;
+}
+
+.intent:hover {
+  background: var(--app-soft);
+}
+
+.intent[aria-pressed='true'] {
+  background: var(--app-ink);
+  color: var(--app-card);
+}
+
+.intent:focus-visible {
+  outline-offset: 2px;
+}

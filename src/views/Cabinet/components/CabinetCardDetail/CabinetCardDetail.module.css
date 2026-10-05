@@ -1,0 +1,45 @@
+.card,
+.actions {
+  width: 100%;
+  max-width: 320px;
+  margin-inline: auto;
+}
+
+.card {
+  position: relative;
+  perspective: 1000px;
+}
+
+.faces {
+  display: grid;
+  aspect-ratio: 85.6 / 54;
+  transform-style: preserve-3d;
+  transition: transform 350ms ease;
+}
+
+.flipped {
+  transform: rotateY(180deg);
+}
+
+.front,
+.back {
+  grid-area: 1 / 1;
+  align-self: start;
+  min-width: 0;
+  backface-visibility: hidden;
+}
+
+.back {
+  transform: rotateY(180deg);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .faces {
+    transition: none;
+  }
+}
+
+.reveal {
+  min-height: 40px;
+  padding-inline: 8px;
+}

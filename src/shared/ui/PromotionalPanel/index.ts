@@ -1,0 +1,1 @@
+export { PromotionalPanel } from './PromotionalPanel';

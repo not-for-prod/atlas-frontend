@@ -1,0 +1,71 @@
+.tile {
+  background: var(--app-card);
+  color: var(--app-ink);
+  border: 0;
+  border-radius: 22px;
+  padding: var(--app-panel-padding);
+  min-height: 96px;
+  cursor: pointer;
+  text-align: left;
+  font: inherit;
+  transition: transform 150ms;
+}
+
+.tile:disabled {
+  background: var(--app-soft);
+  color: var(--app-muted);
+  cursor: not-allowed;
+}
+
+.tile:focus-visible {
+  outline: 2px solid var(--app-ink);
+  outline-offset: 2px;
+}
+
+.tile:hover:not(:disabled) {
+  transform: translateY(-3px);
+}
+
+.accent {
+  background: var(--app-lime);
+}
+
+.icons {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.label {
+  font-size: 14px;
+  font-weight: 600;
+}
+
+@media (width < 48em) {
+  .tile {
+    padding: var(--app-panel-padding);
+    min-height: 92px;
+  }
+
+  .label {
+    font-size: 13px;
+  }
+}
+
+.tile.inline {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 48px;
+  padding: 12px 10px;
+}
+
+.inline .icons {
+  flex-shrink: 0;
+  margin-bottom: 0;
+}
+
+.inline .label {
+  white-space: nowrap;
+}

@@ -1,0 +1,47 @@
+.item {
+  border-radius: 22px;
+  background: var(--app-card);
+  padding: 0 24px;
+}
+
+.item summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  list-style: none;
+  font-size: 15px;
+  font-weight: 600;
+  padding: 22px 0;
+  cursor: pointer;
+}
+
+.item summary::-webkit-details-marker {
+  display: none;
+}
+
+.item summary span {
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+  width: 26px;
+  height: 26px;
+  background: var(--app-paper);
+  border-radius: 50%;
+  font-size: 20px;
+  font-weight: 400;
+  transition: transform 150ms;
+}
+
+.item[open] summary span {
+  transform: rotate(45deg);
+}
+
+.item p {
+  color: var(--app-muted);
+  margin: 0;
+  padding-bottom: 24px;
+  max-width: 760px;
+  font-size: 14px;
+  line-height: 1.8;
+}

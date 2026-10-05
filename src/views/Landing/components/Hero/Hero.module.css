@@ -1,0 +1,96 @@
+.hero {
+  display: grid;
+  grid-template-columns: 1.1fr 1fr;
+  gap: 28px;
+  align-items: center;
+}
+
+.copy {
+  position: relative;
+  z-index: 1;
+}
+
+.badge {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 10px;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  margin: 0 0 16px;
+  color: var(--app-card-ink);
+}
+
+.badge span {
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--app-lime);
+}
+
+.hero h1 {
+  font-size: clamp(36px, 4.7vw, 59px);
+  line-height: 1.04;
+  font-weight: 800;
+  letter-spacing: -0.045em;
+  margin: 0 0 16px;
+}
+
+.description {
+  font-size: 15px;
+  line-height: 1.7;
+  color: var(--app-card-ink);
+  margin: 0;
+  max-width: 460px;
+}
+
+.primary {
+  background: var(--app-lime);
+  color: var(--app-lime-ink);
+  font-size: 14px;
+  padding: 0 20px;
+}
+
+.secondary {
+  border-color: var(--app-card-ink);
+  color: var(--app-card);
+  font-size: 14px;
+  padding: 0 20px;
+}
+
+.secondary:hover {
+  background: var(--app-graphite);
+}
+
+.hero a:focus-visible {
+  outline-color: var(--app-lime);
+}
+
+.note {
+  font-size: 11px;
+  line-height: 1.6;
+  color: var(--app-card-ink);
+  margin: 18px 0 0;
+  max-width: 340px;
+}
+
+@media (width < 54em) {
+  .hero {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 20px;
+  }
+
+  .hero h1 {
+    font-size: clamp(32px, 7vw, 48px);
+    max-width: 620px;
+  }
+
+  .hero > div:last-child {
+    max-width: 220px;
+  }
+
+  .primary,
+  .secondary {
+    width: 100%;
+  }
+}

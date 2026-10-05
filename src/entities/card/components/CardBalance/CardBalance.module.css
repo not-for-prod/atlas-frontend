@@ -1,0 +1,18 @@
+.label {
+  font-size: max(11px, 2.5cqw);
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  color: var(--visual-sub, inherit);
+}
+
+.amount {
+  font-size: 8cqw;
+  font-weight: 600;
+  line-height: 1.15;
+  letter-spacing: -0.04em;
+  font-variant-numeric: tabular-nums;
+}
+
+.unavailable {
+  font-size: max(12px, 3.5cqw);
+}

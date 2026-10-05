@@ -1,0 +1,27 @@
+.panel {
+  position: relative;
+  background: var(--mantine-color-lime-light);
+  border-radius: var(--mantine-radius-default);
+}
+
+.link {
+  display: block;
+  padding: var(--mantine-spacing-md);
+  padding-inline-end: calc(var(--mantine-spacing-md) * 2 + 28px);
+  color: inherit;
+  text-decoration: none;
+  border-radius: inherit;
+}
+
+.link:focus-visible {
+  outline: 2px solid var(--app-lime-text);
+  outline-offset: 3px;
+}
+
+.panel .dismiss {
+  position: absolute;
+  inset-inline-end: var(--mantine-spacing-md);
+  inset-block: 0;
+  margin-block: auto;
+  z-index: 1;
+}

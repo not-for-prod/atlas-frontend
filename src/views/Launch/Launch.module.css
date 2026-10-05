@@ -1,0 +1,36 @@
+.main {
+  max-width: 800px;
+  margin: 0 auto;
+  padding-block: 64px;
+  min-height: 60dvh;
+  text-align: center;
+}
+
+.main h1 {
+  letter-spacing: -1.2px;
+  line-height: 1.15;
+}
+
+.badge {
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  font-weight: 600;
+  color: var(--app-muted);
+  margin: 0;
+}
+
+.selection {
+  max-width: 380px;
+  width: 100%;
+  margin: 16px 0;
+}
+
+@media (width < 54em) {
+  .main {
+    padding-block: 40px;
+  }
+
+  .main h1 {
+    font-size: 32px;
+  }
+}

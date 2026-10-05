@@ -1,0 +1,1 @@
+export { UsdtTronIcon } from './UsdtTronIcon';

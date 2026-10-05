@@ -1,0 +1,33 @@
+.badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  border-radius: 999px;
+  padding: 5px 9px;
+  font-size: 10px;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.badge > span {
+  width: 4px;
+  height: 4px;
+  background: currentcolor;
+  border-radius: 50%;
+}
+
+.success {
+  background: var(--app-lime);
+  color: var(--app-lime-ink);
+}
+
+.pending,
+.reserved {
+  background: var(--app-soft);
+  color: var(--app-ink);
+}
+
+.failed {
+  background: var(--app-paper);
+  color: var(--app-danger);
+}

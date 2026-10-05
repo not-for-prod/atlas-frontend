@@ -1,0 +1,44 @@
+.panel {
+  padding: var(--app-panel-padding);
+  background: var(--app-card);
+  border: 1px solid var(--app-line);
+  border-radius: var(--app-radius);
+  min-width: 0;
+}
+
+.artwork {
+  width: 100%;
+  max-width: 320px;
+  margin-inline: auto;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 16px;
+  padding-block: 16px;
+  border-bottom: 1px solid var(--app-line);
+}
+
+.row:last-child {
+  border-bottom: 0;
+}
+
+.amount {
+  white-space: nowrap;
+  font-weight: 700;
+}
+
+.selected {
+  outline: 2px solid var(--app-lime-text);
+  outline-offset: 2px;
+}
+
+.accountActions {
+  width: 100%;
+}
+
+.back {
+  align-self: flex-start;
+}

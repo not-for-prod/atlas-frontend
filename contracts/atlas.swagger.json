@@ -1,0 +1,2803 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "authorization/v1/service.proto",
+    "version": "version not set"
+  },
+  "tags": [
+    {
+      "name": "AuthenticationService",
+      "description": "AuthenticationService exposes authentication commands and progress queries.\nThe host must authorize access to each transaction independently of its ID."
+    },
+    {
+      "name": "PaymentService",
+      "description": "PaymentService manages payments for the authenticated client.\nOwnership comes from authentication, never from a caller-supplied client ID."
+    },
+    {
+      "name": "VirtualCardService",
+      "description": "VirtualCardService manages cards owned by the authenticated client.\nMutations may return before provider processing finishes.\nIdempotency keys are scoped to client and method: identical retries return the\noriginal operation; reuse with a different payload is rejected."
+    },
+    {
+      "name": "SupportService",
+      "description": "SupportService exposes public customer support contact information."
+    },
+    {
+      "name": "KYCService",
+      "description": "KYCService collects the authenticated client's identity data."
+    },
+    {
+      "name": "NotificationService",
+      "description": "NotificationService manages the authenticated client's Telegram notifications."
+    }
+  ],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "paths": {
+    "/v1/tenants/{tenantId}/auth/policy": {
+      "get": {
+        "summary": "GetAuthPolicy lists caller-visible intents and configured authentication choices.\nThis is a static description, not a guarantee of current method availability.",
+        "operationId": "AuthenticationService_GetAuthPolicy",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authorization.v1.GetAuthPolicyResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": ["AuthenticationService"]
+      }
+    },
+    "/v1/tenants/{tenantId}/auth/transactions": {
+      "post": {
+        "summary": "CreateTransaction starts a tenant-bound authentication transaction for a configured intent.",
+        "operationId": "AuthenticationService_CreateTransaction",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authorization.v1.CreateTransactionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authorization.v1.AuthenticationService.CreateTransactionBody"
+            }
+          }
+        ],
+        "tags": ["AuthenticationService"]
+      }
+    },
+    "/v1/tenants/{tenantId}/auth/transactions/{transactionId}": {
+      "get": {
+        "summary": "GetTransaction reads progress without returning a session credential.",
+        "operationId": "AuthenticationService_GetTransaction",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authorization.v1.GetTransactionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "transactionId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": ["AuthenticationService"]
+      }
+    },
+    "/v1/tenants/{tenantId}/auth/transactions/{transactionId}/challenges/{challengeId}:completeCallback": {
+      "post": {
+        "summary": "CompleteCallback dispatches host-parsed callback input to the stored method.\nThis is not a provider's raw redirect URI; proof and correlation are verified\nby the callback-capable driver before any evidence is accepted.",
+        "operationId": "AuthenticationService_CompleteCallback",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authorization.v1.CompleteCallbackResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "transactionId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "challengeId",
+            "description": "Method selection comes from this challenge, not from callback input.",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authorization.v1.AuthenticationService.CompleteCallbackBody"
+            }
+          }
+        ],
+        "tags": ["AuthenticationService"]
+      }
+    },
+    "/v1/tenants/{tenantId}/auth/transactions/{transactionId}:startMethod": {
+      "post": {
+        "summary": "StartMethod begins a selected method, optionally creating a challenge.",
+        "operationId": "AuthenticationService_StartMethod",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authorization.v1.StartMethodResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "transactionId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authorization.v1.AuthenticationService.StartMethodBody"
+            }
+          }
+        ],
+        "tags": ["AuthenticationService"]
+      }
+    },
+    "/v1/tenants/{tenantId}/auth/transactions/{transactionId}:verifyMethod": {
+      "post": {
+        "summary": "VerifyMethod verifies a direct proof or completes a pending challenge.",
+        "operationId": "AuthenticationService_VerifyMethod",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/authorization.v1.VerifyMethodResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "tenantId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "transactionId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/authorization.v1.AuthenticationService.VerifyMethodBody"
+            }
+          }
+        ],
+        "tags": ["AuthenticationService"]
+      }
+    },
+    "/v1/balances": {
+      "get": {
+        "summary": "ListBalances returns the client's wallet assets.",
+        "operationId": "PaymentService_ListBalances",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.payment.v1.ListBalancesResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "tags": ["PaymentService"]
+      }
+    },
+    "/v1/payments": {
+      "get": {
+        "summary": "ListPayments returns payment history, newest first by creation time and ID.",
+        "operationId": "PaymentService_ListPayments",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.payment.v1.ListPaymentsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pageSize",
+            "description": "Zero selects the server default of 20.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageToken",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": ["PaymentService"]
+      }
+    },
+    "/v1/payments/crypto-deposit-addresses": {
+      "post": {
+        "summary": "RequestCryptoDeposit creates deposit instructions without creating a payment.",
+        "operationId": "PaymentService_RequestCryptoDeposit",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.payment.v1.RequestCryptoDepositResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/atlas.payment.v1.RequestCryptoDepositRequest"
+            }
+          }
+        ],
+        "tags": ["PaymentService"]
+      }
+    },
+    "/v1/payments/deposits": {
+      "post": {
+        "summary": "Deposit creates a funding request; creation does not credit the wallet.",
+        "operationId": "PaymentService_Deposit",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.payment.v1.DepositResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/atlas.payment.v1.DepositRequest"
+            }
+          }
+        ],
+        "tags": ["PaymentService"]
+      }
+    },
+    "/v1/payments/{paymentId}": {
+      "get": {
+        "summary": "GetPayment returns an owned payment, including available deposit instructions.",
+        "operationId": "PaymentService_GetPayment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.payment.v1.GetPaymentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "paymentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": ["PaymentService"]
+      }
+    },
+    "/v1/cards": {
+      "get": {
+        "summary": "ListCards returns the client's cards in stable ID order.",
+        "operationId": "VirtualCardService_ListCards",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.ListCardsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "pageSize",
+            "description": "Zero selects the server default of 20.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageToken",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": ["VirtualCardService"]
+      },
+      "post": {
+        "summary": "IssueCard creates an issuance payment charged to the client's USD wallet.",
+        "operationId": "VirtualCardService_IssueCard",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.IssueCardResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.IssueCardRequest"
+            }
+          }
+        ],
+        "tags": ["VirtualCardService"]
+      }
+    },
+    "/v1/cards/tariff": {
+      "get": {
+        "summary": "GetTariff publicly returns only this service's configured card pricing.",
+        "operationId": "VirtualCardService_GetTariff",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.GetTariffResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "tags": ["VirtualCardService"]
+      }
+    },
+    "/v1/cards/{cardId}": {
+      "get": {
+        "summary": "GetCard returns an owned card with available live metadata, balance and requisites.",
+        "operationId": "VirtualCardService_GetCard",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.GetCardResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": ["VirtualCardService"]
+      }
+    },
+    "/v1/cards/{cardId}/close": {
+      "post": {
+        "summary": "CloseCard requests closure; poll GetCard until its state resolves.",
+        "operationId": "VirtualCardService_CloseCard",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.CloseCardResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.VirtualCardService.CloseCardBody"
+            }
+          }
+        ],
+        "tags": ["VirtualCardService"]
+      }
+    },
+    "/v1/cards/{cardId}/top-ups": {
+      "post": {
+        "summary": "TopUpCard creates a card funding payment charged to the client's USD wallet.",
+        "operationId": "VirtualCardService_TopUpCard",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.TopUpCardResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.VirtualCardService.TopUpCardBody"
+            }
+          }
+        ],
+        "tags": ["VirtualCardService"]
+      }
+    },
+    "/v1/payments/tariff": {
+      "get": {
+        "summary": "GetTariff publicly returns only this service's configured payment settings.",
+        "operationId": "PaymentService_GetTariff",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.payment.v1.GetTariffResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "tags": ["PaymentService"]
+      }
+    },
+    "/v1/support": {
+      "get": {
+        "summary": "GetSupport returns the configured Telegram support account link.",
+        "operationId": "SupportService_GetSupport",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.support.v1.GetSupportResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "tags": ["SupportService"]
+      }
+    },
+    "/v1/kyc": {
+      "put": {
+        "summary": "SaveKYC replaces collected data without starting or granting verification.",
+        "operationId": "KYCService_SaveKYC",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.kyc.v1.SaveKYCResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/atlas.kyc.v1.SaveKYCRequest"
+            }
+          }
+        ],
+        "tags": ["KYCService"]
+      }
+    },
+    "/v1/card-issues/current": {
+      "get": {
+        "summary": "GetCurrentIssue restores an active issuance after a reload or lost response.",
+        "operationId": "VirtualCardService_GetCurrentIssue",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.GetCurrentIssueResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "tags": ["VirtualCardService"]
+      }
+    },
+    "/v1/card-issues/{issueId}": {
+      "get": {
+        "summary": "GetIssue returns an issuance owned by the authenticated client.",
+        "operationId": "VirtualCardService_GetIssue",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.GetIssueResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "issueId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": ["VirtualCardService"]
+      }
+    },
+    "/v1/card-issues/{issueId}/funding/resolve": {
+      "post": {
+        "summary": "ResolveFunding records an operator decision for an unknown funding transfer.",
+        "operationId": "VirtualCardService_ResolveFunding",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.ResolveFundingResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "issueId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.VirtualCardService.ResolveFundingBody"
+            }
+          }
+        ],
+        "tags": ["VirtualCardService"]
+      }
+    },
+    "/v1/card-issues/{issueId}/reconcile": {
+      "post": {
+        "summary": "ReconcileFunds records the evidenced net provider charge for support reconciliation.",
+        "operationId": "VirtualCardService_ReconcileFunds",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.ReconcileFundsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "issueId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.VirtualCardService.ReconcileFundsBody"
+            }
+          }
+        ],
+        "tags": ["VirtualCardService"]
+      }
+    },
+    "/v1/card-issues/{issueId}/resolve": {
+      "post": {
+        "summary": "ResolveIssue records an operator decision for an unknown issuance.",
+        "operationId": "VirtualCardService_ResolveIssue",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.ResolveIssueResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "issueId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.VirtualCardService.ResolveIssueBody"
+            }
+          }
+        ],
+        "tags": ["VirtualCardService"]
+      }
+    },
+    "/v1/kyc/level": {
+      "get": {
+        "summary": "GetKYCLevel returns only the caller's server-owned verification level.",
+        "operationId": "KYCService_GetKYCLevel",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.kyc.v1.GetKYCLevelResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "tags": ["KYCService"]
+      }
+    },
+    "/v1/card-top-ups/{topUpId}": {
+      "get": {
+        "summary": "GetTopUp returns an order owned by the authenticated client.",
+        "operationId": "VirtualCardService_GetTopUp",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.GetTopUpResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "topUpId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": ["VirtualCardService"]
+      }
+    },
+    "/v1/cards/{cardId}/top-ups/current": {
+      "get": {
+        "summary": "GetCurrentTopUp restores the active top-up for an owned card.",
+        "operationId": "VirtualCardService_GetCurrentTopUp",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.GetCurrentTopUpResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": ["VirtualCardService"]
+      }
+    },
+    "/v1/cards/{cardId}/top-ups/quote": {
+      "post": {
+        "summary": "GetTopUpQuote returns the client commission for the requested card credit.",
+        "operationId": "VirtualCardService_GetTopUpQuote",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.GetTopUpQuoteResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.VirtualCardService.GetTopUpQuoteBody"
+            }
+          }
+        ],
+        "tags": ["VirtualCardService"]
+      }
+    },
+    "/v1/notifications/settings": {
+      "get": {
+        "summary": "GetNotificationSettings reads persisted preferences and Telegram connection readiness.",
+        "operationId": "NotificationService_GetNotificationSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.notification.v1.GetNotificationSettingsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "tags": ["NotificationService"]
+      },
+      "put": {
+        "summary": "UpdateNotificationSettings saves the shared promo and sending preference.",
+        "operationId": "NotificationService_UpdateNotificationSettings",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.notification.v1.UpdateNotificationSettingsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/atlas.notification.v1.UpdateNotificationSettingsRequest"
+            }
+          }
+        ],
+        "tags": ["NotificationService"]
+      }
+    },
+    "/v1/notifications/telegram:complete": {
+      "post": {
+        "summary": "CompleteTelegramConnection links the verified Telegram identity to the current user.",
+        "operationId": "NotificationService_CompleteTelegramConnection",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.notification.v1.CompleteTelegramConnectionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/atlas.notification.v1.CompleteTelegramConnectionRequest"
+            }
+          }
+        ],
+        "tags": ["NotificationService"]
+      }
+    },
+    "/v1/notifications/telegram:start": {
+      "post": {
+        "summary": "StartTelegramConnection requests verified identity and bot messaging consent.",
+        "operationId": "NotificationService_StartTelegramConnection",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.notification.v1.StartTelegramConnectionResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/atlas.notification.v1.StartTelegramConnectionRequest"
+            }
+          }
+        ],
+        "tags": ["NotificationService"]
+      }
+    },
+    "/v1/cards/{cardId}/operations": {
+      "get": {
+        "summary": "ListCardOperations reads actual provider transactions for an owned card.",
+        "operationId": "VirtualCardService_ListCardOperations",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.card.v1.ListCardOperationsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "cardId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "pageSize",
+            "description": "Zero selects the default of 20.",
+            "in": "query",
+            "required": false,
+            "type": "integer",
+            "format": "int32"
+          },
+          {
+            "name": "pageToken",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": ["VirtualCardService"]
+      }
+    }
+  },
+  "definitions": {
+    "authorization.v1.AuthenticationResult": {
+      "type": "object",
+      "properties": {
+        "principal": {
+          "$ref": "#/definitions/authorization.v1.Principal"
+        },
+        "session": {
+          "$ref": "#/definitions/authorization.v1.IssuedSession",
+          "description": "Present when finalization issues a session for this intent."
+        }
+      },
+      "description": "AuthenticationResult is present only after the application finalizes the flow."
+    },
+    "authorization.v1.AuthenticationService.CompleteCallbackBody": {
+      "type": "object",
+      "properties": {
+        "input": {
+          "type": "object",
+          "description": "Host-parsed driver-specific callback proof; never log this object."
+        },
+        "attemptId": {
+          "type": "string"
+        }
+      }
+    },
+    "authorization.v1.AuthenticationService.CreateTransactionBody": {
+      "type": "object",
+      "properties": {
+        "intent": {
+          "$ref": "#/definitions/authorization.v1.Intent",
+          "description": "An existing user is derived from trusted authentication context, never input."
+        }
+      }
+    },
+    "authorization.v1.AuthenticationService.StartMethodBody": {
+      "type": "object",
+      "properties": {
+        "selection": {
+          "$ref": "#/definitions/authorization.v1.MethodSelection"
+        },
+        "input": {
+          "type": "object",
+          "description": "Driver-specific JSON decoded and validated for this method and operation.\nUse an empty object when the driver requires no input."
+        }
+      }
+    },
+    "authorization.v1.AuthenticationService.VerifyMethodBody": {
+      "type": "object",
+      "properties": {
+        "challengeId": {
+          "type": "string",
+          "description": "Omit for direct verification. When present, must match the stored attempt challenge."
+        },
+        "input": {
+          "type": "object",
+          "description": "Driver-specific proof; never log this object."
+        },
+        "attemptId": {
+          "type": "string"
+        }
+      }
+    },
+    "authorization.v1.Challenge": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "selection": {
+          "$ref": "#/definitions/authorization.v1.MethodSelection"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Challenge identifies a pending attempt without exposing its private state."
+    },
+    "authorization.v1.CompleteCallbackResponse": {
+      "type": "object",
+      "properties": {
+        "transaction": {
+          "$ref": "#/definitions/authorization.v1.Transaction"
+        },
+        "result": {
+          "$ref": "#/definitions/authorization.v1.AuthenticationResult",
+          "description": "Absent while further authentication or finalization is required."
+        }
+      }
+    },
+    "authorization.v1.CreateTransactionResponse": {
+      "type": "object",
+      "properties": {
+        "transaction": {
+          "$ref": "#/definitions/authorization.v1.Transaction"
+        }
+      }
+    },
+    "authorization.v1.GetAuthPolicyResponse": {
+      "type": "object",
+      "properties": {
+        "intents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/authorization.v1.IntentPolicy"
+          },
+          "description": "Sorted by intent name. Empty when no configured intent is visible."
+        }
+      }
+    },
+    "authorization.v1.GetTransactionResponse": {
+      "type": "object",
+      "properties": {
+        "transaction": {
+          "$ref": "#/definitions/authorization.v1.Transaction"
+        }
+      }
+    },
+    "authorization.v1.Intent": {
+      "type": "string",
+      "enum": ["INTENT_UNSPECIFIED", "INTENT_SIGN_UP", "INTENT_SIGN_IN", "INTENT_UPDATE", "INTENT_DELETE"],
+      "default": "INTENT_UNSPECIFIED",
+      "description": "Intent identifies an account lifecycle flow, independently of authentication methods.\nDeclaring an intent does not imply that its application workflow is implemented."
+    },
+    "authorization.v1.IntentPolicy": {
+      "type": "object",
+      "properties": {
+        "intent": {
+          "$ref": "#/definitions/authorization.v1.Intent"
+        },
+        "requirements": {
+          "$ref": "#/definitions/authorization.v1.PolicyRequirement"
+        }
+      },
+      "description": "IntentPolicy describes one caller-visible configured intent."
+    },
+    "authorization.v1.IssuedSession": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "token": {
+          "type": "string",
+          "description": "Sensitive bearer credential; never log or return in transaction reads."
+        },
+        "issuedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "IssuedSession contains a newly issued credential and its validity interval."
+    },
+    "authorization.v1.MethodSelection": {
+      "type": "object",
+      "properties": {
+        "requirementId": {
+          "type": "string"
+        },
+        "methodId": {
+          "type": "string"
+        },
+        "providerId": {
+          "type": "string",
+          "description": "Empty for methods without a provider."
+        }
+      },
+      "description": "MethodSelection identifies one policy option within a requirement scope."
+    },
+    "authorization.v1.PendingMethod": {
+      "type": "object",
+      "properties": {
+        "attemptId": {
+          "type": "string"
+        },
+        "selection": {
+          "$ref": "#/definitions/authorization.v1.MethodSelection"
+        },
+        "challengeId": {
+          "type": "string"
+        },
+        "ready": {
+          "type": "boolean"
+        }
+      },
+      "description": "PendingMethod allows clients to resume a started method without private driver state."
+    },
+    "authorization.v1.PolicyRequirement": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "any": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/authorization.v1.PolicyRequirement"
+          }
+        },
+        "all": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/authorization.v1.PolicyRequirement"
+          }
+        },
+        "method": {
+          "type": "string"
+        },
+        "provider": {
+          "type": "string",
+          "description": "Empty for methods without a provider. Set only on method leaves."
+        }
+      },
+      "description": "PolicyRequirement is a public requirement tree. Each node has exactly one\nnonempty shape: any, all, or method. Groups preserve their configured IDs.\nDescendants inherit the nearest nonempty ID as their MethodSelection scope.\nProvider alternatives are represented as any children of method leaves.\nAn all group requires every child, but does not impose an execution order."
+    },
+    "authorization.v1.Principal": {
+      "type": "object",
+      "properties": {
+        "tenantId": {
+          "type": "string"
+        },
+        "userId": {
+          "type": "string"
+        },
+        "authenticatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "Principal identifies the verified subject after successful finalization."
+    },
+    "authorization.v1.StartMethodResponse": {
+      "type": "object",
+      "properties": {
+        "transaction": {
+          "$ref": "#/definitions/authorization.v1.Transaction"
+        },
+        "challenge": {
+          "$ref": "#/definitions/authorization.v1.Challenge",
+          "description": "Absent for methods that do not create a challenge."
+        },
+        "redirectUrl": {
+          "type": "string",
+          "description": "Empty for methods that do not redirect the client."
+        },
+        "attemptId": {
+          "type": "string",
+          "description": "Required reference for the following Verify or Callback request."
+        }
+      }
+    },
+    "authorization.v1.Transaction": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "tenantId": {
+          "type": "string"
+        },
+        "intent": {
+          "$ref": "#/definitions/authorization.v1.Intent"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "availableMethods": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/authorization.v1.MethodSelection"
+          },
+          "description": "Options from the remaining policy that are currently available to this user.\nThis list does not express whether the options are alternatives or cumulative."
+        },
+        "policySatisfied": {
+          "type": "boolean",
+          "description": "Policy satisfaction alone does not imply user resolution or finalization."
+        },
+        "pendingAttempt": {
+          "$ref": "#/definitions/authorization.v1.PendingMethod"
+        },
+        "status": {
+          "type": "string"
+        }
+      },
+      "description": "Transaction is a public progress view without credentials or verified evidence."
+    },
+    "authorization.v1.VerifyMethodResponse": {
+      "type": "object",
+      "properties": {
+        "transaction": {
+          "$ref": "#/definitions/authorization.v1.Transaction"
+        },
+        "result": {
+          "$ref": "#/definitions/authorization.v1.AuthenticationResult",
+          "description": "Absent while further authentication or finalization is required."
+        }
+      }
+    },
+    "google.protobuf.Any": {
+      "type": "object",
+      "properties": {
+        "@type": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": {}
+    },
+    "google.protobuf.NullValue": {
+      "type": "string",
+      "enum": ["NULL_VALUE"],
+      "default": "NULL_VALUE",
+      "description": "`NullValue` is a singleton enumeration to represent the null value for the\n`Value` type union.\n\nThe JSON representation for `NullValue` is JSON `null`.\n\n - NULL_VALUE: Null value."
+    },
+    "google.rpc.Status": {
+      "type": "object",
+      "properties": {
+        "code": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "message": {
+          "type": "string"
+        },
+        "details": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/google.protobuf.Any"
+          }
+        }
+      }
+    },
+    "atlas.common.v1.Money": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        }
+      },
+      "description": "Money contains an exact major-denomination decimal string and its currency.\nValues never pass through floating point or currency-scale conversion."
+    },
+    "atlas.payment.v1.Balance": {
+      "type": "object",
+      "properties": {
+        "assetId": {
+          "type": "string"
+        },
+        "available": {
+          "$ref": "#/definitions/atlas.common.v1.Money"
+        },
+        "reserved": {
+          "$ref": "#/definitions/atlas.common.v1.Money"
+        }
+      },
+      "description": "Balance is a client's virtual wallet asset, separate from card balances.\nCurrently each client has one USD asset; amounts are USD decimal values."
+    },
+    "atlas.payment.v1.CryptoDepositOptions": {
+      "type": "object",
+      "properties": {
+        "network": {
+          "type": "string"
+        }
+      },
+      "description": "CryptoDepositOptions selects the network for the amount's currency.\nThe server checks supported currency/network combinations."
+    },
+    "atlas.payment.v1.CryptoRequisite": {
+      "type": "object",
+      "properties": {
+        "currency": {
+          "type": "string"
+        },
+        "network": {
+          "type": "string"
+        },
+        "address": {
+          "type": "string"
+        },
+        "memo": {
+          "type": "string",
+          "description": "Absent when the network does not require a tag or memo."
+        }
+      },
+      "description": "CryptoRequisite identifies the destination for a crypto deposit."
+    },
+    "atlas.payment.v1.DepositRequest": {
+      "type": "object",
+      "properties": {
+        "idempotencyKey": {
+          "type": "string",
+          "description": "Reusing a key with the same request returns the original result.\nReusing it with a different request is rejected; scope is client and method."
+        },
+        "amount": {
+          "$ref": "#/definitions/atlas.common.v1.Money",
+          "description": "External payment amount; conversion into the USD wallet is server-owned."
+        },
+        "sbp": {
+          "$ref": "#/definitions/atlas.payment.v1.SBPDepositOptions"
+        },
+        "crypto": {
+          "$ref": "#/definitions/atlas.payment.v1.CryptoDepositOptions"
+        }
+      }
+    },
+    "atlas.payment.v1.DepositRequisite": {
+      "type": "object",
+      "properties": {
+        "sbp": {
+          "$ref": "#/definitions/atlas.payment.v1.SBPRequisite"
+        },
+        "crypto": {
+          "$ref": "#/definitions/atlas.payment.v1.CryptoRequisite"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time",
+          "description": "Absent when the provider does not declare an expiration."
+        }
+      },
+      "description": "DepositRequisite contains exactly one set of funding instructions."
+    },
+    "atlas.payment.v1.DepositResponse": {
+      "type": "object",
+      "properties": {
+        "payment": {
+          "$ref": "#/definitions/atlas.payment.v1.Payment"
+        }
+      }
+    },
+    "atlas.payment.v1.GetPaymentResponse": {
+      "type": "object",
+      "properties": {
+        "payment": {
+          "$ref": "#/definitions/atlas.payment.v1.Payment"
+        }
+      }
+    },
+    "atlas.payment.v1.ListBalancesResponse": {
+      "type": "object",
+      "properties": {
+        "balances": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/atlas.payment.v1.Balance"
+          }
+        }
+      }
+    },
+    "atlas.payment.v1.ListPaymentsResponse": {
+      "type": "object",
+      "properties": {
+        "payments": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/atlas.payment.v1.Payment"
+          }
+        },
+        "nextPageToken": {
+          "type": "string",
+          "description": "Empty when there are no further results."
+        }
+      }
+    },
+    "atlas.payment.v1.Payment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "type": {
+          "$ref": "#/definitions/atlas.payment.v1.PaymentType"
+        },
+        "status": {
+          "$ref": "#/definitions/atlas.payment.v1.PaymentStatus"
+        },
+        "amount": {
+          "$ref": "#/definitions/atlas.common.v1.Money",
+          "description": "External deposit amount, pending card quote, or actual settled card charge."
+        },
+        "fee": {
+          "$ref": "#/definitions/atlas.common.v1.Money",
+          "description": "Customer fee included in amount, in the same currency."
+        },
+        "creditedAmount": {
+          "$ref": "#/definitions/atlas.common.v1.Money",
+          "description": "Amount credited to the USD wallet or card; absent until determined."
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "cardId": {
+          "type": "string",
+          "description": "Present for card operations once the card is identified."
+        },
+        "requisite": {
+          "$ref": "#/definitions/atlas.payment.v1.DepositRequisite",
+          "description": "Present for deposits once funding instructions are available."
+        },
+        "reservedAmount": {
+          "$ref": "#/definitions/atlas.common.v1.Money",
+          "description": "Outstanding wallet reservation for a card operation; absent for deposits."
+        },
+        "releasedAmount": {
+          "$ref": "#/definitions/atlas.common.v1.Money",
+          "description": "Wallet funds released from the reservation; absent for deposits."
+        }
+      },
+      "description": "Payment is a customer-visible operation, without internal provider costs."
+    },
+    "atlas.payment.v1.PaymentStatus": {
+      "type": "string",
+      "enum": [
+        "PAYMENT_STATUS_UNSPECIFIED",
+        "PAYMENT_STATUS_CREATED",
+        "PAYMENT_STATUS_PENDING",
+        "PAYMENT_STATUS_REJECTED",
+        "PAYMENT_STATUS_COMPLETED",
+        "PAYMENT_STATUS_CANCELLED",
+        "PAYMENT_STATUS_ERROR",
+        "PAYMENT_STATUS_INSPECTION",
+        "PAYMENT_STATUS_FAILED"
+      ],
+      "default": "PAYMENT_STATUS_UNSPECIFIED",
+      "description": "PaymentStatus describes the customer-visible processing outcome."
+    },
+    "atlas.payment.v1.PaymentType": {
+      "type": "string",
+      "enum": [
+        "PAYMENT_TYPE_UNSPECIFIED",
+        "PAYMENT_TYPE_DEPOSIT",
+        "PAYMENT_TYPE_CARD_ISSUE",
+        "PAYMENT_TYPE_CARD_TOP_UP"
+      ],
+      "default": "PAYMENT_TYPE_UNSPECIFIED",
+      "description": "PaymentType identifies the customer operation shown in payment history."
+    },
+    "atlas.payment.v1.RequestCryptoDepositRequest": {
+      "type": "object",
+      "properties": {
+        "idempotencyKey": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "network": {
+          "type": "string"
+        }
+      }
+    },
+    "atlas.payment.v1.RequestCryptoDepositResponse": {
+      "type": "object",
+      "properties": {
+        "walletId": {
+          "type": "string"
+        },
+        "requisite": {
+          "$ref": "#/definitions/atlas.payment.v1.CryptoRequisite"
+        }
+      }
+    },
+    "atlas.payment.v1.SBPDepositOptions": {
+      "type": "object",
+      "description": "SBPDepositOptions selects SBP funding in RUB."
+    },
+    "atlas.payment.v1.SBPRequisite": {
+      "type": "object",
+      "properties": {
+        "paymentUrl": {
+          "type": "string"
+        }
+      },
+      "description": "SBPRequisite directs the payer to an SBP payment page."
+    },
+    "atlas.card.v1.Card": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "cardTypeId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "maskedNumber": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/atlas.card.v1.CardStatus"
+        },
+        "balance": {
+          "$ref": "#/definitions/atlas.common.v1.Money",
+          "description": "Provider-reported card funds, separate from the virtual wallet.\nAbsent when unavailable; absence does not mean a zero balance."
+        }
+      },
+      "description": "Card contains customer-visible metadata without PAN or CVV."
+    },
+    "atlas.card.v1.CardFee": {
+      "type": "object",
+      "properties": {
+        "minimal": {
+          "type": "string"
+        },
+        "fixed": {
+          "type": "string"
+        },
+        "percent": {
+          "type": "string"
+        }
+      },
+      "description": "CardFee uses USD decimal amounts and exact decimal percentage points.\nOmitted components mean zero. The fee is max(minimal, fixed + percent * amount / 100), rounded upward to a cent."
+    },
+    "atlas.card.v1.CardStatus": {
+      "type": "string",
+      "enum": [
+        "CARD_STATUS_UNSPECIFIED",
+        "CARD_STATUS_CREATING",
+        "CARD_STATUS_ACTIVE",
+        "CARD_STATUS_FROZEN",
+        "CARD_STATUS_CLOSING",
+        "CARD_STATUS_CLOSED",
+        "CARD_STATUS_EXPIRED",
+        "CARD_STATUS_FAILED"
+      ],
+      "default": "CARD_STATUS_UNSPECIFIED",
+      "description": "CardStatus is the normalized customer-visible card state."
+    },
+    "atlas.card.v1.CardTariffCategory": {
+      "type": "object",
+      "properties": {
+        "description": {
+          "type": "string"
+        },
+        "fees": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/atlas.card.v1.CardFee"
+          }
+        },
+        "topup": {
+          "$ref": "#/definitions/atlas.card.v1.CardTopUpLimits"
+        },
+        "name": {
+          "type": "string"
+        },
+        "palette": {
+          "$ref": "#/definitions/atlas.card.v1.CardPalette"
+        }
+      },
+      "description": "CardTariffCategory describes a configurable card type keyed by its stable string ID."
+    },
+    "atlas.card.v1.CloseCardResponse": {
+      "type": "object",
+      "properties": {
+        "card": {
+          "$ref": "#/definitions/atlas.card.v1.Card"
+        }
+      }
+    },
+    "atlas.card.v1.GetCardResponse": {
+      "type": "object",
+      "properties": {
+        "card": {
+          "$ref": "#/definitions/atlas.card.v1.Card"
+        },
+        "requisites": {
+          "$ref": "#/definitions/atlas.card.v1.CardRequisites",
+          "description": "Absent when unavailable. Sensitive: never persist, log or cache."
+        }
+      }
+    },
+    "atlas.card.v1.GetTariffResponse": {
+      "type": "object",
+      "properties": {
+        "tariffId": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string",
+          "description": "All fixed/minimum fees are decimal amounts of this currency (USD)."
+        },
+        "categories": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/atlas.card.v1.CardTariffCategory"
+          }
+        }
+      }
+    },
+    "atlas.card.v1.IssueCardRequest": {
+      "type": "object",
+      "properties": {
+        "idempotencyKey": {
+          "type": "string"
+        },
+        "cardTypeId": {
+          "type": "string",
+          "description": "Application offering identifier, not a provider identifier."
+        },
+        "name": {
+          "type": "string"
+        },
+        "expectedPrice": {
+          "type": "string",
+          "description": "Customer-confirmed quote in USD decimal values. Reject a changed tariff before reserving."
+        },
+        "expectedCommission": {
+          "type": "string"
+        }
+      }
+    },
+    "atlas.card.v1.IssueCardResponse": {
+      "type": "object",
+      "properties": {
+        "issue": {
+          "$ref": "#/definitions/atlas.card.v1.CardIssue",
+          "description": "Poll GetIssue until the issuance resolves."
+        },
+        "payment": {
+          "$ref": "#/definitions/atlas.payment.v1.Payment",
+          "description": "Reserved for the separate payment history projection."
+        }
+      }
+    },
+    "atlas.card.v1.ListCardsResponse": {
+      "type": "object",
+      "properties": {
+        "cards": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/atlas.card.v1.Card"
+          }
+        },
+        "nextPageToken": {
+          "type": "string"
+        }
+      }
+    },
+    "atlas.card.v1.TopUpCardResponse": {
+      "type": "object",
+      "properties": {
+        "payment": {
+          "$ref": "#/definitions/atlas.payment.v1.Payment"
+        },
+        "topUp": {
+          "$ref": "#/definitions/atlas.card.v1.CardTopUp"
+        }
+      }
+    },
+    "atlas.card.v1.VirtualCardService.CloseCardBody": {
+      "type": "object",
+      "properties": {
+        "idempotencyKey": {
+          "type": "string"
+        }
+      }
+    },
+    "atlas.card.v1.VirtualCardService.TopUpCardBody": {
+      "type": "object",
+      "properties": {
+        "idempotencyKey": {
+          "type": "string"
+        },
+        "amount": {
+          "$ref": "#/definitions/atlas.common.v1.Money",
+          "description": "Requested card credit in the card's currency; the server determines wallet charge and fees."
+        },
+        "expectedCommission": {
+          "type": "string",
+          "description": "Confirmed commission in USD decimal values; omitted values are rejected before reservation."
+        }
+      }
+    },
+    "atlas.payment.v1.GetTariffResponse": {
+      "type": "object",
+      "properties": {
+        "tariffId": {
+          "type": "string"
+        },
+        "deposit": {
+          "type": "object",
+          "additionalProperties": {
+            "$ref": "#/definitions/atlas.payment.v1.PaymentMethodTariff"
+          },
+          "description": "CRYPTO and SBP currently contain unconfigured placeholders."
+        }
+      }
+    },
+    "atlas.payment.v1.PaymentMethodTariff": {
+      "type": "object",
+      "properties": {
+        "minimalAmount": {
+          "type": "string",
+          "description": "Omitted bounds are unspecified. Amounts are decimal values of the payment currency."
+        },
+        "maximumAmount": {
+          "type": "string"
+        }
+      },
+      "description": "PaymentMethodTariff describes inclusive deposit amount limits, independently of fees.\nIts presence does not enable a payment method."
+    },
+    "atlas.card.v1.CardTopUpLimits": {
+      "type": "object",
+      "properties": {
+        "minimalAmount": {
+          "type": "string"
+        },
+        "maximumAmount": {
+          "type": "string"
+        }
+      },
+      "description": "CardTopUpLimits uses inclusive USD decimal bounds. Omitted bounds are unspecified."
+    },
+    "atlas.support.v1.GetSupportResponse": {
+      "type": "object",
+      "properties": {
+        "telegramUrl": {
+          "type": "string",
+          "description": "Empty when Telegram support is not configured."
+        }
+      }
+    },
+    "atlas.kyc.v1.KYCData": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        },
+        "phone": {
+          "type": "string"
+        },
+        "firstName": {
+          "type": "string"
+        },
+        "lastName": {
+          "type": "string"
+        },
+        "middleName": {
+          "type": "string"
+        },
+        "birthDate": {
+          "type": "string",
+          "description": "Calendar date in YYYY-MM-DD format."
+        },
+        "passport": {
+          "$ref": "#/definitions/atlas.kyc.v1.Passport"
+        }
+      },
+      "description": "KYCData contains sensitive collected identity data. Never log this message."
+    },
+    "atlas.kyc.v1.KYCLevel": {
+      "type": "string",
+      "enum": ["KYC_LEVEL_UNSPECIFIED", "KYC_LEVEL_UNVERIFIED", "KYC_LEVEL_VERIFIED"],
+      "default": "KYC_LEVEL_UNSPECIFIED",
+      "description": "KYCLevel is local verification, not provider KYC status."
+    },
+    "atlas.kyc.v1.Passport": {
+      "type": "object",
+      "properties": {
+        "issuingCountry": {
+          "type": "string",
+          "enum": [
+            "AD",
+            "AE",
+            "AF",
+            "AG",
+            "AI",
+            "AL",
+            "AM",
+            "AO",
+            "AQ",
+            "AR",
+            "AS",
+            "AT",
+            "AU",
+            "AW",
+            "AX",
+            "AZ",
+            "BA",
+            "BB",
+            "BD",
+            "BE",
+            "BF",
+            "BG",
+            "BH",
+            "BI",
+            "BJ",
+            "BL",
+            "BM",
+            "BN",
+            "BO",
+            "BQ",
+            "BR",
+            "BS",
+            "BT",
+            "BV",
+            "BW",
+            "BY",
+            "BZ",
+            "CA",
+            "CC",
+            "CD",
+            "CF",
+            "CG",
+            "CH",
+            "CI",
+            "CK",
+            "CL",
+            "CM",
+            "CN",
+            "CO",
+            "CR",
+            "CU",
+            "CV",
+            "CW",
+            "CX",
+            "CY",
+            "CZ",
+            "DE",
+            "DJ",
+            "DK",
+            "DM",
+            "DO",
+            "DZ",
+            "EC",
+            "EE",
+            "EG",
+            "EH",
+            "ER",
+            "ES",
+            "ET",
+            "FI",
+            "FJ",
+            "FK",
+            "FM",
+            "FO",
+            "FR",
+            "GA",
+            "GB",
+            "GD",
+            "GE",
+            "GF",
+            "GG",
+            "GH",
+            "GI",
+            "GL",
+            "GM",
+            "GN",
+            "GP",
+            "GQ",
+            "GR",
+            "GS",
+            "GT",
+            "GU",
+            "GW",
+            "GY",
+            "HK",
+            "HM",
+            "HN",
+            "HR",
+            "HT",
+            "HU",
+            "ID",
+            "IE",
+            "IL",
+            "IM",
+            "IN",
+            "IO",
+            "IQ",
+            "IR",
+            "IS",
+            "IT",
+            "JE",
+            "JM",
+            "JO",
+            "JP",
+            "KE",
+            "KG",
+            "KH",
+            "KI",
+            "KM",
+            "KN",
+            "KP",
+            "KR",
+            "KW",
+            "KY",
+            "KZ",
+            "LA",
+            "LB",
+            "LC",
+            "LI",
+            "LK",
+            "LR",
+            "LS",
+            "LT",
+            "LU",
+            "LV",
+            "LY",
+            "MA",
+            "MC",
+            "MD",
+            "ME",
+            "MF",
+            "MG",
+            "MH",
+            "MK",
+            "ML",
+            "MM",
+            "MN",
+            "MO",
+            "MP",
+            "MQ",
+            "MR",
+            "MS",
+            "MT",
+            "MU",
+            "MV",
+            "MW",
+            "MX",
+            "MY",
+            "MZ",
+            "NA",
+            "NC",
+            "NE",
+            "NF",
+            "NG",
+            "NI",
+            "NL",
+            "NO",
+            "NP",
+            "NR",
+            "NU",
+            "NZ",
+            "OM",
+            "PA",
+            "PE",
+            "PF",
+            "PG",
+            "PH",
+            "PK",
+            "PL",
+            "PM",
+            "PN",
+            "PR",
+            "PS",
+            "PT",
+            "PW",
+            "PY",
+            "QA",
+            "RE",
+            "RO",
+            "RS",
+            "RU",
+            "RW",
+            "SA",
+            "SB",
+            "SC",
+            "SD",
+            "SE",
+            "SG",
+            "SH",
+            "SI",
+            "SJ",
+            "SK",
+            "SL",
+            "SM",
+            "SN",
+            "SO",
+            "SR",
+            "SS",
+            "ST",
+            "SV",
+            "SX",
+            "SY",
+            "SZ",
+            "TC",
+            "TD",
+            "TF",
+            "TG",
+            "TH",
+            "TJ",
+            "TK",
+            "TL",
+            "TM",
+            "TN",
+            "TO",
+            "TR",
+            "TT",
+            "TV",
+            "TW",
+            "TZ",
+            "UA",
+            "UG",
+            "UM",
+            "US",
+            "UY",
+            "UZ",
+            "VA",
+            "VC",
+            "VE",
+            "VG",
+            "VI",
+            "VN",
+            "VU",
+            "WF",
+            "WS",
+            "YE",
+            "YT",
+            "ZA",
+            "ZM",
+            "ZW"
+          ],
+          "description": "ISO 3166-1 country enum. String encoding preserves the original API and stored payloads.\nSource: https://data.iana.org/time-zones/tzdb/iso3166.tab (2026-09-29)."
+        },
+        "number": {
+          "type": "string"
+        },
+        "issueDate": {
+          "type": "string"
+        },
+        "expiryDate": {
+          "type": "string",
+          "description": "Empty when the document has no expiry."
+        }
+      },
+      "description": "Passport contains document details, without scans."
+    },
+    "atlas.kyc.v1.SaveKYCRequest": {
+      "type": "object",
+      "properties": {
+        "data": {
+          "$ref": "#/definitions/atlas.kyc.v1.KYCData"
+        }
+      }
+    },
+    "atlas.kyc.v1.SaveKYCResponse": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "$ref": "#/definitions/atlas.kyc.v1.KYCLevel"
+        }
+      }
+    },
+    "atlas.card.v1.CardIssue": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "cardTypeId": {
+          "type": "string"
+        },
+        "name": {
+          "type": "string"
+        },
+        "status": {
+          "$ref": "#/definitions/atlas.card.v1.CardIssueStatus"
+        },
+        "price": {
+          "$ref": "#/definitions/atlas.common.v1.Money"
+        },
+        "fee": {
+          "$ref": "#/definitions/atlas.common.v1.Money"
+        },
+        "cardId": {
+          "type": "string"
+        },
+        "failureCode": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "stage": {
+          "$ref": "#/definitions/atlas.card.v1.CardIssueStage"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/atlas.card.v1.CardIssueStep"
+          }
+        }
+      },
+      "description": "CardIssue exposes the frozen price and current issuance outcome."
+    },
+    "atlas.card.v1.CardIssueStatus": {
+      "type": "string",
+      "enum": [
+        "CARD_ISSUE_STATUS_UNSPECIFIED",
+        "CARD_ISSUE_STATUS_PENDING",
+        "CARD_ISSUE_STATUS_VERIFYING",
+        "CARD_ISSUE_STATUS_FUNDING",
+        "CARD_ISSUE_STATUS_ISSUING",
+        "CARD_ISSUE_STATUS_COMPLETED",
+        "CARD_ISSUE_STATUS_FAILED",
+        "CARD_ISSUE_STATUS_REJECTED",
+        "CARD_ISSUE_STATUS_NEEDS_REVIEW",
+        "CARD_ISSUE_STATUS_FINALIZING"
+      ],
+      "default": "CARD_ISSUE_STATUS_UNSPECIFIED",
+      "description": "CardIssueStatus describes progress without exposing provider identifiers."
+    },
+    "atlas.card.v1.GetCurrentIssueResponse": {
+      "type": "object",
+      "properties": {
+        "issue": {
+          "$ref": "#/definitions/atlas.card.v1.CardIssue"
+        }
+      }
+    },
+    "atlas.card.v1.GetIssueResponse": {
+      "type": "object",
+      "properties": {
+        "issue": {
+          "$ref": "#/definitions/atlas.card.v1.CardIssue"
+        }
+      }
+    },
+    "atlas.card.v1.ReconcileFundsResponse": {
+      "type": "object"
+    },
+    "atlas.card.v1.ResolveFundingResponse": {
+      "type": "object"
+    },
+    "atlas.card.v1.ResolveIssueResponse": {
+      "type": "object"
+    },
+    "atlas.card.v1.VirtualCardService.ReconcileFundsBody": {
+      "type": "object",
+      "properties": {
+        "chargedAmount": {
+          "type": "string",
+          "description": "Net amount consumed by this issuance as a decimal string in its funding currency."
+        },
+        "evidence": {
+          "type": "string",
+          "description": "SHA-256 digest of operator-retained provider evidence."
+        }
+      }
+    },
+    "atlas.card.v1.VirtualCardService.ResolveFundingBody": {
+      "type": "object",
+      "properties": {
+        "providerPaymentId": {
+          "type": "string"
+        },
+        "completed": {
+          "type": "boolean"
+        },
+        "evidence": {
+          "type": "string",
+          "description": "SHA-256 digest of operator-retained provider evidence."
+        }
+      }
+    },
+    "atlas.card.v1.VirtualCardService.ResolveIssueBody": {
+      "type": "object",
+      "properties": {
+        "providerPaymentId": {
+          "type": "string"
+        },
+        "providerCardId": {
+          "type": "string"
+        },
+        "failureCode": {
+          "type": "string"
+        },
+        "evidence": {
+          "type": "string",
+          "description": "SHA-256 digest of operator-retained provider evidence."
+        }
+      }
+    },
+    "atlas.card.v1.CardPalette": {
+      "type": "object",
+      "properties": {
+        "background": {
+          "type": "string"
+        },
+        "foreground": {
+          "type": "string"
+        }
+      },
+      "description": "CardPalette contains solid card colors, never arbitrary CSS."
+    },
+    "atlas.kyc.v1.GetKYCLevelResponse": {
+      "type": "object",
+      "properties": {
+        "level": {
+          "$ref": "#/definitions/atlas.kyc.v1.KYCLevel"
+        }
+      }
+    },
+    "atlas.card.v1.CardIssueStage": {
+      "type": "string",
+      "enum": [
+        "CARD_ISSUE_STAGE_UNSPECIFIED",
+        "CARD_ISSUE_STAGE_RESERVING_FUNDS",
+        "CARD_ISSUE_STAGE_REGISTERING_CLIENT",
+        "CARD_ISSUE_STAGE_VERIFYING_IDENTITY",
+        "CARD_ISSUE_STAGE_FUNDING_ACCOUNT",
+        "CARD_ISSUE_STAGE_ISSUING_CARD",
+        "CARD_ISSUE_STAGE_FINALIZING_CARD"
+      ],
+      "default": "CARD_ISSUE_STAGE_UNSPECIFIED",
+      "description": "CardIssueStage identifies the current or failed step in the issuance journey."
+    },
+    "atlas.card.v1.CardIssueStep": {
+      "type": "object",
+      "properties": {
+        "stage": {
+          "$ref": "#/definitions/atlas.card.v1.CardIssueStage"
+        },
+        "status": {
+          "$ref": "#/definitions/atlas.card.v1.CardIssueStepStatus"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "CardIssueStep is one ordered milestone; absent timestamps are not inferred."
+    },
+    "atlas.card.v1.CardIssueStepStatus": {
+      "type": "string",
+      "enum": [
+        "CARD_ISSUE_STEP_STATUS_UNSPECIFIED",
+        "CARD_ISSUE_STEP_STATUS_UPCOMING",
+        "CARD_ISSUE_STEP_STATUS_CURRENT",
+        "CARD_ISSUE_STEP_STATUS_COMPLETED",
+        "CARD_ISSUE_STEP_STATUS_FAILED"
+      ],
+      "default": "CARD_ISSUE_STEP_STATUS_UNSPECIFIED",
+      "description": "CardIssueStepStatus describes an individual customer-visible step."
+    },
+    "atlas.card.v1.CardRequisites": {
+      "type": "object",
+      "properties": {
+        "number": {
+          "type": "string"
+        },
+        "securityCode": {
+          "type": "string"
+        },
+        "expirationMonth": {
+          "type": "string"
+        },
+        "expirationYear": {
+          "type": "string"
+        },
+        "holderName": {
+          "type": "string"
+        },
+        "billingAddress": {
+          "$ref": "#/definitions/atlas.card.v1.CardBillingAddress"
+        }
+      },
+      "description": "CardRequisites contains stored payment details for an owned card."
+    },
+    "atlas.card.v1.CardTopUp": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "cardId": {
+          "type": "string"
+        },
+        "amount": {
+          "$ref": "#/definitions/atlas.common.v1.Money"
+        },
+        "fee": {
+          "$ref": "#/definitions/atlas.common.v1.Money"
+        },
+        "status": {
+          "$ref": "#/definitions/atlas.card.v1.CardTopUpStatus"
+        },
+        "stage": {
+          "$ref": "#/definitions/atlas.card.v1.CardTopUpStage"
+        },
+        "steps": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/atlas.card.v1.CardTopUpStep"
+          }
+        },
+        "failureCode": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "CardTopUp contains safe order progress and the confirmed client quote."
+    },
+    "atlas.card.v1.CardTopUpStage": {
+      "type": "string",
+      "enum": [
+        "CARD_TOP_UP_STAGE_UNSPECIFIED",
+        "CARD_TOP_UP_STAGE_RESERVING_FUNDS",
+        "CARD_TOP_UP_STAGE_FUNDING_ACCOUNT",
+        "CARD_TOP_UP_STAGE_TOPPING_UP_CARD"
+      ],
+      "default": "CARD_TOP_UP_STAGE_UNSPECIFIED",
+      "description": "CardTopUpStage identifies the current or failed milestone."
+    },
+    "atlas.card.v1.CardTopUpStatus": {
+      "type": "string",
+      "enum": [
+        "CARD_TOP_UP_STATUS_UNSPECIFIED",
+        "CARD_TOP_UP_STATUS_PENDING",
+        "CARD_TOP_UP_STATUS_FUNDING",
+        "CARD_TOP_UP_STATUS_TOPPING_UP",
+        "CARD_TOP_UP_STATUS_COMPLETED",
+        "CARD_TOP_UP_STATUS_FAILED",
+        "CARD_TOP_UP_STATUS_REJECTED"
+      ],
+      "default": "CARD_TOP_UP_STATUS_UNSPECIFIED",
+      "description": "CardTopUpStatus describes the persisted top-up outcome."
+    },
+    "atlas.card.v1.CardTopUpStep": {
+      "type": "object",
+      "properties": {
+        "stage": {
+          "$ref": "#/definitions/atlas.card.v1.CardTopUpStage"
+        },
+        "status": {
+          "$ref": "#/definitions/atlas.card.v1.CardTopUpStepStatus"
+        },
+        "completedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "CardTopUpStep is one ordered persisted milestone."
+    },
+    "atlas.card.v1.CardTopUpStepStatus": {
+      "type": "string",
+      "enum": [
+        "CARD_TOP_UP_STEP_STATUS_UNSPECIFIED",
+        "CARD_TOP_UP_STEP_STATUS_UPCOMING",
+        "CARD_TOP_UP_STEP_STATUS_CURRENT",
+        "CARD_TOP_UP_STEP_STATUS_COMPLETED",
+        "CARD_TOP_UP_STEP_STATUS_FAILED"
+      ],
+      "default": "CARD_TOP_UP_STEP_STATUS_UNSPECIFIED",
+      "description": "CardTopUpStepStatus describes an individual milestone."
+    },
+    "atlas.card.v1.GetCurrentTopUpResponse": {
+      "type": "object",
+      "properties": {
+        "topUp": {
+          "$ref": "#/definitions/atlas.card.v1.CardTopUp"
+        }
+      }
+    },
+    "atlas.card.v1.GetTopUpQuoteResponse": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "$ref": "#/definitions/atlas.common.v1.Money"
+        },
+        "fee": {
+          "$ref": "#/definitions/atlas.common.v1.Money"
+        }
+      }
+    },
+    "atlas.card.v1.GetTopUpResponse": {
+      "type": "object",
+      "properties": {
+        "topUp": {
+          "$ref": "#/definitions/atlas.card.v1.CardTopUp"
+        }
+      }
+    },
+    "atlas.card.v1.VirtualCardService.GetTopUpQuoteBody": {
+      "type": "object",
+      "properties": {
+        "amount": {
+          "$ref": "#/definitions/atlas.common.v1.Money"
+        }
+      }
+    },
+    "atlas.card.v1.CardBillingAddress": {
+      "type": "object",
+      "properties": {
+        "countryCode": {
+          "type": "string"
+        },
+        "addressLine1": {
+          "type": "string"
+        },
+        "addressLine2": {
+          "type": "string"
+        },
+        "city": {
+          "type": "string"
+        },
+        "region": {
+          "type": "string"
+        },
+        "postalCode": {
+          "type": "string"
+        }
+      },
+      "description": "CardBillingAddress contains the stable checkout address for a card."
+    },
+    "atlas.notification.v1.CompleteTelegramConnectionRequest": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "type": "string"
+        },
+        "code": {
+          "type": "string"
+        },
+        "error": {
+          "type": "string"
+        }
+      }
+    },
+    "atlas.notification.v1.CompleteTelegramConnectionResponse": {
+      "type": "object",
+      "properties": {
+        "telegramConnected": {
+          "type": "boolean"
+        }
+      }
+    },
+    "atlas.notification.v1.GetNotificationSettingsResponse": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        },
+        "telegramConnected": {
+          "type": "boolean"
+        },
+        "connectionAvailable": {
+          "type": "boolean"
+        }
+      }
+    },
+    "atlas.notification.v1.StartTelegramConnectionRequest": {
+      "type": "object"
+    },
+    "atlas.notification.v1.StartTelegramConnectionResponse": {
+      "type": "object",
+      "properties": {
+        "redirectUrl": {
+          "type": "string"
+        }
+      }
+    },
+    "atlas.notification.v1.UpdateNotificationSettingsRequest": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "atlas.notification.v1.UpdateNotificationSettingsResponse": {
+      "type": "object",
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "atlas.card.v1.CardOperation": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string",
+          "description": "Opaque row identity; not an Atlas wallet payment ID."
+        },
+        "type": {
+          "$ref": "#/definitions/atlas.card.v1.CardOperationType"
+        },
+        "status": {
+          "$ref": "#/definitions/atlas.card.v1.CardOperationStatus"
+        },
+        "amount": {
+          "$ref": "#/definitions/atlas.common.v1.Money"
+        },
+        "fee": {
+          "$ref": "#/definitions/atlas.common.v1.Money"
+        },
+        "settlement": {
+          "$ref": "#/definitions/atlas.common.v1.Money"
+        },
+        "merchantName": {
+          "type": "string"
+        },
+        "transactionTime": {
+          "type": "string",
+          "description": "Original provider timestamp. No timezone is inferred when absent."
+        }
+      },
+      "description": "CardOperation is a read-only observation of a provider card transaction."
+    },
+    "atlas.card.v1.CardOperationStatus": {
+      "type": "string",
+      "enum": [
+        "CARD_OPERATION_STATUS_UNSPECIFIED",
+        "CARD_OPERATION_STATUS_AUTHORIZED",
+        "CARD_OPERATION_STATUS_PENDING",
+        "CARD_OPERATION_STATUS_COMPLETED",
+        "CARD_OPERATION_STATUS_DECLINED",
+        "CARD_OPERATION_STATUS_CANCELED"
+      ],
+      "default": "CARD_OPERATION_STATUS_UNSPECIFIED",
+      "description": "CardOperationStatus identifies the provider's observed processing state."
+    },
+    "atlas.card.v1.CardOperationType": {
+      "type": "string",
+      "enum": [
+        "CARD_OPERATION_TYPE_UNSPECIFIED",
+        "CARD_OPERATION_TYPE_PURCHASE",
+        "CARD_OPERATION_TYPE_REFUND",
+        "CARD_OPERATION_TYPE_TOP_UP",
+        "CARD_OPERATION_TYPE_WITHDRAWAL",
+        "CARD_OPERATION_TYPE_FEE"
+      ],
+      "default": "CARD_OPERATION_TYPE_UNSPECIFIED",
+      "description": "CardOperationType identifies the observed operation kind."
+    },
+    "atlas.card.v1.ListCardOperationsResponse": {
+      "type": "object",
+      "properties": {
+        "operations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/atlas.card.v1.CardOperation"
+          }
+        },
+        "nextPageToken": {
+          "type": "string"
+        }
+      }
+    }
+  }
+}

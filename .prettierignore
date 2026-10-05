@@ -1,0 +1,9 @@
+node_modules
+.next
+coverage
+bun.lock
+src/generated
+public
+artifacts
+
+next-env.d.ts

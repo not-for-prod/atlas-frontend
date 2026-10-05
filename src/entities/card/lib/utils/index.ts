@@ -1,0 +1,1 @@
+export { parseCardDesign } from './parseCardDesign';

@@ -1,0 +1,14 @@
+.controls {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 12px;
+}
+
+@media (width >= 48em) {
+  .controls {
+    float: right;
+    position: relative;
+    z-index: 1;
+    margin-left: 20px;
+  }
+}

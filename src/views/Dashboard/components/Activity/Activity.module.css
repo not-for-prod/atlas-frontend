@@ -1,0 +1,36 @@
+.section {
+  background: var(--app-card);
+  border-radius: var(--app-radius);
+  padding: var(--app-panel-padding) var(--app-panel-padding) 8px;
+}
+
+.section h2 {
+  margin: 0 0 6px;
+  font-size: 18px;
+  font-weight: 700;
+  letter-spacing: -0.4px;
+}
+
+.section p {
+  margin: 0 0 12px;
+  color: var(--app-muted);
+  font-size: 11px;
+}
+
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.empty {
+  padding: 24px 0;
+  font-size: 13px;
+  color: var(--app-muted);
+}
+
+@media (width < 48em) {
+  .section {
+    padding: var(--app-panel-padding) var(--app-panel-padding) 8px;
+  }
+}

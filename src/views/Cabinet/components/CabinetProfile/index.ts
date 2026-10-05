@@ -1,0 +1,1 @@
+export { CabinetProfile } from './CabinetProfile';

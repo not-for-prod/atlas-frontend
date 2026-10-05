@@ -1,0 +1,84 @@
+.header {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+  padding-block: 24px;
+}
+
+.nav {
+  display: flex;
+  gap: 26px;
+  margin-left: auto;
+  font-size: 14px;
+}
+
+.nav a {
+  color: var(--app-muted);
+}
+
+.nav a:hover {
+  color: var(--app-ink);
+}
+
+.login {
+  background: var(--app-ink);
+}
+
+.skip {
+  position: absolute;
+  top: -100px;
+  left: 20px;
+  z-index: 10;
+  padding: 14px;
+  border-radius: 16px;
+  background: var(--app-lime);
+}
+
+.skip:focus {
+  top: 12px;
+}
+
+.mobileMenu {
+  display: none;
+}
+
+@media (width < 54em) {
+  .header {
+    padding-block: 12px;
+    gap: 12px;
+  }
+
+  .nav {
+    display: none;
+  }
+
+  .mobileMenu {
+    display: block;
+    position: relative;
+    margin-left: auto;
+    font-size: 13px;
+  }
+
+  .mobileMenu summary {
+    cursor: pointer;
+    padding: 12px 4px;
+    min-height: 44px;
+  }
+
+  .mobileMenu nav {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    z-index: 10;
+    min-width: 180px;
+    padding: 8px;
+    background: var(--app-card);
+    border: 1px solid var(--app-line);
+    border-radius: 16px;
+  }
+
+  .mobileMenu a {
+    display: block;
+    padding: 12px;
+  }
+}

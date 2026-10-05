@@ -1,0 +1,36 @@
+.section {
+  padding-top: var(--app-section-space);
+  scroll-margin-top: 24px;
+}
+
+.section h2 {
+  margin: 0 0 12px;
+  font-size: clamp(28px, 3vw, 36px);
+  font-weight: 800;
+  letter-spacing: -1px;
+}
+
+.section > p {
+  color: var(--app-muted);
+  font-size: 15px;
+  margin: 0 0 24px;
+}
+
+.steps {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+}
+
+@media (width < 54em) {
+  .section {
+    padding-top: var(--app-section-space);
+  }
+
+  .steps {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

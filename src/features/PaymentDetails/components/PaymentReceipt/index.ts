@@ -1,0 +1,1 @@
+export { PaymentReceipt } from './PaymentReceipt';

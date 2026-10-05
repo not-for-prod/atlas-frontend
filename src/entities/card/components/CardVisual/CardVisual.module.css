@@ -1,0 +1,276 @@
+.card {
+  position: relative;
+  container-type: inline-size;
+  width: 100%;
+  max-width: 380px;
+  aspect-ratio: 85.6 / 54;
+  border-radius: var(--card-visual-radius, 3.7% / 5.9%);
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--visual-bg);
+  color: var(--visual-ink);
+  box-shadow: var(--app-card-shadow);
+  transform: perspective(1000px) rotateX(var(--tilt-x, 0deg)) rotateY(var(--tilt-y, 0deg));
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
+  user-select: none;
+}
+
+.card::before {
+  content: '';
+  position: absolute;
+  z-index: -1;
+  width: 78cqw;
+  aspect-ratio: 1;
+  right: -30cqw;
+  top: -38cqw;
+  border-radius: 50%;
+  background: var(--visual-orb);
+}
+
+.top {
+  position: absolute;
+  top: 6.5cqw;
+  left: 7cqw;
+  right: 7cqw;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1cqw;
+  overflow-wrap: anywhere;
+  font-size: 3.6cqw;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  color: var(--visual-sub);
+}
+
+.symbol {
+  flex-shrink: 0;
+  width: 6.5cqw;
+  aspect-ratio: 1;
+  color: var(--visual-ink);
+  opacity: 0.85;
+  background: radial-gradient(
+    circle at 0 50%,
+    transparent 0 22%,
+    currentcolor 22% 30%,
+    transparent 30% 48%,
+    currentcolor 48% 56%,
+    transparent 56% 74%,
+    currentcolor 74% 82%,
+    transparent 82%
+  );
+  mask: conic-gradient(from 45deg at 0 50%, #000 0 90deg, transparent 90deg);
+}
+
+.chip {
+  position: absolute;
+  top: 22cqw;
+  left: 7cqw;
+  width: 12.5cqw;
+  aspect-ratio: 1.3;
+  border-radius: 2cqw;
+  background:
+    linear-gradient(
+      90deg,
+      transparent 32%,
+      var(--app-orb-dark) 32% 35%,
+      transparent 35% 65%,
+      var(--app-orb-dark) 65% 68%,
+      transparent 68%
+    ),
+    linear-gradient(
+      0deg,
+      transparent 30%,
+      var(--app-orb-dark) 30% 34%,
+      transparent 34% 66%,
+      var(--app-orb-dark) 66% 70%,
+      transparent 70%
+    ),
+    linear-gradient(135deg, var(--app-metal-hi), var(--app-metal-lo) 55%, var(--app-metal-hi));
+}
+
+.number {
+  position: absolute;
+  right: 7cqw;
+  top: 25.5cqw;
+  font-family: monospace;
+  font-size: 4.2cqw;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  color: var(--visual-sub);
+}
+
+.bottom {
+  position: absolute;
+  left: 6.2cqw;
+  right: 7cqw;
+  bottom: 4.2cqw;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+}
+
+.brand {
+  font-size: 15cqw;
+  font-weight: 700;
+  line-height: 0.9;
+  letter-spacing: -0.045em;
+}
+
+.brand b {
+  color: var(--visual-dot);
+}
+
+.demo {
+  color: var(--visual-sub);
+  font-size: 2.4cqw;
+  letter-spacing: 0.08em;
+}
+
+.premium {
+  --visual-bg: linear-gradient(150deg, var(--app-graphite), var(--app-ink) 60%);
+  --visual-ink: var(--app-card);
+  --visual-sub: var(--app-card-ink);
+  --visual-dot: var(--app-lime);
+  --visual-orb: var(--app-sheen-soft);
+
+  outline: 1px solid var(--app-orb);
+  outline-offset: -1px;
+}
+
+.subscriptions {
+  --visual-bg: var(--app-lime);
+  --visual-ink: var(--app-lime-ink);
+  --visual-sub: var(--app-lime-ink);
+  --visual-dot: var(--app-ink);
+  --visual-orb: var(--app-orb-dark);
+}
+
+.travel {
+  --visual-bg: var(--app-paper);
+  --visual-ink: var(--app-ink);
+  --visual-sub: var(--app-muted);
+  --visual-dot: var(--app-lime-text);
+  --visual-orb: var(--app-orb);
+}
+
+.premium::before {
+  box-shadow: inset 0 0 0 1.5px var(--app-orb);
+}
+
+.card[data-tilting] {
+  transition: transform 0.08s linear;
+}
+
+.card::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  pointer-events: none;
+  background:
+    radial-gradient(70cqw 70cqw at var(--glare-x, 20%) var(--glare-y, 0%), var(--app-sheen), transparent 60%),
+    linear-gradient(115deg, var(--app-sheen-soft), transparent 40%);
+  mix-blend-mode: soft-light;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .card,
+  .card[data-tilting] {
+    transition: none;
+    transform: none;
+  }
+}
+
+.balance {
+  position: absolute;
+  top: 20cqw;
+  left: 7cqw;
+  right: 7cqw;
+}
+
+.neutral {
+  --visual-bg: #e8e8e8;
+  --visual-ink: #242424;
+  --visual-sub: #424242;
+  --visual-orb: #d8d8d8;
+}
+
+.card[data-palette]::before {
+  opacity: 0.06;
+}
+
+.cardName {
+  position: absolute;
+  top: 18cqw;
+  left: 6cqw;
+  right: 6cqw;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  font-size: 6cqw;
+  font-weight: 500;
+  line-height: 1.15;
+  overflow-wrap: anywhere;
+}
+
+.ownedBrand {
+  font-size: max(13px, 3.6cqw);
+  font-weight: 600;
+  letter-spacing: -0.04em;
+}
+
+.ownedBrand b {
+  color: var(--visual-dot);
+}
+
+.typeName {
+  min-width: 0;
+  max-width: 60%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: max(12px, 3.2cqw);
+}
+
+.card[data-presentation='owned'] .top {
+  top: 2cqw;
+  left: 6cqw;
+  right: 3cqw;
+  min-height: 40px;
+  color: var(--visual-ink);
+}
+
+.card[data-presentation='owned'] .balance {
+  top: 34cqw;
+  left: 6cqw;
+  right: 6cqw;
+}
+
+.card[data-presentation='owned'] .bottom {
+  bottom: 5cqw;
+  left: 6cqw;
+  right: 6cqw;
+  align-items: center;
+}
+
+.card[data-presentation='owned'] .demo {
+  font-size: 11px;
+  letter-spacing: 0;
+}
+
+.card[data-presentation='owned'] button:focus-visible {
+  outline-color: var(--visual-ink);
+  outline-offset: -3px;
+}
+
+.card[data-presentation='owned']::before {
+  width: 55cqw;
+  right: -20cqw;
+  top: -30cqw;
+  background: transparent;
+  border: 1px solid currentcolor;
+  opacity: 0.08;
+}

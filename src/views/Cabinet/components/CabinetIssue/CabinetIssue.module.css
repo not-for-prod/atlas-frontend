@@ -1,0 +1,14 @@
+.grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
+  gap: var(--app-space-lg);
+}
+
+.option {
+  min-width: 0;
+  overflow-wrap: anywhere;
+  display: grid;
+  grid-template-rows: subgrid;
+  grid-row: span 5;
+  gap: var(--app-space-lg);
+}

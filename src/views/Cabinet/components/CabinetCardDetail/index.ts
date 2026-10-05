@@ -1,0 +1,1 @@
+export { CabinetCardDetail } from './CabinetCardDetail';
