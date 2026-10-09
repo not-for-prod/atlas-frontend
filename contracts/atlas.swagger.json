@@ -1113,6 +1113,126 @@
         ],
         "tags": ["VirtualCardService"]
       }
+    },
+    "/v1/payments/sbp/previews": {
+      "post": {
+        "summary": "GetSbpPreview quotes a RUB payment for 30 seconds.",
+        "operationId": "PaymentService_GetSbpPreview",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.payment.v1.GetSbpPreviewResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/atlas.payment.v1.GetSbpPreviewRequest"
+            }
+          }
+        ],
+        "tags": ["PaymentService"]
+      }
+    },
+    "/v1/payments/sbp": {
+      "post": {
+        "summary": "CreateSbpPayment accepts an owned, unexpired preview once.",
+        "operationId": "PaymentService_CreateSbpPayment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.payment.v1.CreateSbpPaymentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/atlas.payment.v1.CreateSbpPaymentRequest"
+            }
+          }
+        ],
+        "tags": ["PaymentService"]
+      }
+    },
+    "/v1/payments/sbp/{paymentId}": {
+      "get": {
+        "summary": "GetSbpPayment returns the owned collection outcome.",
+        "operationId": "PaymentService_GetSbpPayment",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.payment.v1.GetSbpPaymentResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "paymentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": ["PaymentService"]
+      }
+    },
+    "/v1/payments/sbp/{paymentId}/qr": {
+      "get": {
+        "summary": "GetSbpPaymentQr reads direct QR access for an owned payment without creating one.",
+        "operationId": "PaymentService_GetSbpPaymentQr",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.payment.v1.GetSbpPaymentQrResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "paymentId",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": ["PaymentService"]
+      }
     }
   },
   "definitions": {
@@ -1973,7 +2093,8 @@
           "type": "string"
         },
         "phone": {
-          "type": "string"
+          "type": "string",
+          "description": "Ignored. The backend generates a synthetic Russian-format KYC phone number."
         },
         "firstName": {
           "type": "string"
@@ -2798,6 +2919,153 @@
           "type": "string"
         }
       }
+    },
+    "atlas.payment.v1.CreateSbpPaymentResponse": {
+      "type": "object",
+      "properties": {
+        "payment": {
+          "$ref": "#/definitions/atlas.payment.v1.SbpPayment"
+        }
+      }
+    },
+    "atlas.payment.v1.GetSbpPreviewRequest": {
+      "type": "object",
+      "properties": {
+        "rubAmount": {
+          "type": "string",
+          "description": "Exactly one amount is required. RUB is gross payment; USD is desired net credit."
+        },
+        "usdAmount": {
+          "type": "string"
+        }
+      }
+    },
+    "atlas.payment.v1.CreateSbpPaymentRequest": {
+      "type": "object",
+      "properties": {
+        "payerIp": {
+          "type": "string",
+          "description": "Optional for providers such as PayHot that do not require a payer IP."
+        },
+        "previewId": {
+          "type": "string"
+        }
+      }
+    },
+    "atlas.payment.v1.GetSbpPaymentResponse": {
+      "type": "object",
+      "properties": {
+        "payment": {
+          "$ref": "#/definitions/atlas.payment.v1.SbpPayment"
+        }
+      }
+    },
+    "atlas.payment.v1.GetSbpPreviewResponse": {
+      "type": "object",
+      "properties": {
+        "preview": {
+          "$ref": "#/definitions/atlas.payment.v1.SbpPreview"
+        }
+      }
+    },
+    "atlas.payment.v1.SbpPayment": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "previewId": {
+          "type": "string"
+        },
+        "status": {
+          "type": "string"
+        },
+        "paymentLink": {
+          "type": "string"
+        },
+        "amount": {
+          "$ref": "#/definitions/atlas.common.v1.Money"
+        },
+        "fee": {
+          "$ref": "#/definitions/atlas.common.v1.Money"
+        },
+        "credit": {
+          "$ref": "#/definitions/atlas.common.v1.Money"
+        },
+        "exchangeRate": {
+          "type": "string"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "SbpPayment records one accepted preview and provider collection."
+    },
+    "atlas.payment.v1.SbpPreview": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "string"
+        },
+        "amount": {
+          "$ref": "#/definitions/atlas.common.v1.Money"
+        },
+        "fee": {
+          "$ref": "#/definitions/atlas.common.v1.Money"
+        },
+        "credit": {
+          "$ref": "#/definitions/atlas.common.v1.Money"
+        },
+        "exchangeRate": {
+          "type": "string"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "SbpPreview is a server-owned quote valid until expires_at."
+    },
+    "atlas.payment.v1.GetSbpPaymentQrResponse": {
+      "type": "object",
+      "properties": {
+        "qr": {
+          "$ref": "#/definitions/atlas.payment.v1.SbpPaymentQr"
+        }
+      }
+    },
+    "atlas.payment.v1.SbpPaymentQr": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/atlas.payment.v1.SbpQrStatus"
+        },
+        "url": {
+          "type": "string"
+        },
+        "expiresAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      },
+      "description": "SbpPaymentQr is transient direct payment access with a provider-owned expiry."
+    },
+    "atlas.payment.v1.SbpQrStatus": {
+      "type": "string",
+      "enum": [
+        "SBP_QR_STATUS_UNSPECIFIED",
+        "SBP_QR_STATUS_CHECKOUT_REQUIRED",
+        "SBP_QR_STATUS_PENDING",
+        "SBP_QR_STATUS_AVAILABLE",
+        "SBP_QR_STATUS_EXPIRED"
+      ],
+      "default": "SBP_QR_STATUS_UNSPECIFIED",
+      "description": "SbpQrStatus describes payment access, not the financial payment outcome."
     }
   }
 }

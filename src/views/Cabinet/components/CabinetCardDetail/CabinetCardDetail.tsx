@@ -85,7 +85,7 @@ export function CabinetCardDetail({ id }: { id?: string }) {
           <div className={styles.back} aria-hidden={!flipped} inert={!flipped}>
             {flipped && (
               <RevealCard
-                key={id}
+                key={`${id}:${card.balance?.currency ?? ''}:${card.balance?.amount ?? 'unavailable'}`}
                 cardId={id}
                 onHide={() => {
                   setRevealedCard(undefined);

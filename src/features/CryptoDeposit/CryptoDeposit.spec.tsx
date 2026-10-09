@@ -1,3 +1,4 @@
+import { StrictMode } from 'react';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { render, screen, within } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -17,15 +18,15 @@ afterEach(() => {
 });
 function mount() {
   return render(
-    <MantineProvider>
-      <IntlProvider locale="ru" messages={messages}>
-        <QueryClientProvider client={new QueryClient()}>
-          <ul>
+    <StrictMode>
+      <MantineProvider>
+        <IntlProvider locale="ru" messages={messages}>
+          <QueryClientProvider client={new QueryClient()}>
             <CryptoDeposit onClose={vi.fn()} />
-          </ul>
-        </QueryClientProvider>
-      </IntlProvider>
-    </MantineProvider>,
+          </QueryClientProvider>
+        </IntlProvider>
+      </MantineProvider>
+    </StrictMode>,
   );
 }
 it('shows an unavailable alert and retries with the original request key', async () => {
@@ -43,7 +44,6 @@ it('shows an unavailable alert and retries with the original request key', async
   vi.stubGlobal('fetch', fetcher);
   const user = userEvent.setup();
   mount();
-  await user.click(screen.getByRole('button', { name: /Получить адрес/ }));
   const alert = await screen.findByRole('alert');
   expect(alert).toHaveTextContent(messages['crypto.unavailable']);
   expect(alert).not.toHaveTextContent(messages['crypto.unknown']);
@@ -60,9 +60,7 @@ it.each(['timeout', 'pending'])('shows an explicit check action for %s', async (
       ? vi.fn().mockRejectedValue(new Error('timeout'))
       : vi.fn().mockResolvedValue(new Response(JSON.stringify({ code: 9 }), { status: 400 })),
   );
-  const user = userEvent.setup();
   mount();
-  await user.click(screen.getByRole('button', { name: /Получить адрес/ }));
   const alert = await screen.findByRole('alert');
   expect(alert).toHaveTextContent(messages['crypto.unknown']);
   expect(within(alert).getByRole('button', { name: messages['crypto.check'] })).toBeVisible();
@@ -71,7 +69,6 @@ it('offers sign-in when the session is missing', async () => {
   vi.stubGlobal('fetch', vi.fn().mockResolvedValue(new Response('', { status: 401 })));
   const user = userEvent.setup();
   mount();
-  await user.click(screen.getByRole('button', { name: /Получить адрес/ }));
   const alert = await screen.findByRole('alert');
   expect(alert).toHaveTextContent(messages['crypto.signIn']);
   await user.click(within(alert).getByRole('button', { name: messages['auth.signIn'] }));

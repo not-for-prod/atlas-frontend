@@ -13,7 +13,7 @@ export class PaymentRequestError extends Error {
     super('Payment request unavailable');
   }
 }
-async function request(path: string, init: RequestInit, signal?: AbortSignal) {
+export async function request(path: string, init: RequestInit, signal?: AbortSignal) {
   const response = await fetch(`${backendOrigin()}${path}`, {
     ...init,
     credentials: 'include',

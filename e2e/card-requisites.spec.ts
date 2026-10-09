@@ -71,7 +71,9 @@ for (const width of [375, 1440]) {
     await expect(page.getByText('000', { exact: true })).toBeVisible();
     await expect(page.getByText('TEST HOLDER', { exact: true })).toBeVisible();
     await expect(page.getByRole('button', { name: 'Обновить реквизиты' })).toHaveCount(0);
-    await expect(page.getByRole('button', { name: 'Повторить', exact: true })).toHaveCount(0);
+    await expect(
+      page.locator('[class*=requisites]').getByRole('button', { name: 'Повторить', exact: true }),
+    ).toHaveCount(0);
     await expect
       .poll(async () => {
         const backSize = await page
@@ -113,5 +115,71 @@ for (const width of [375, 1440]) {
     await page.reload();
     await expect(reveal).toHaveAttribute('aria-pressed', 'false');
     await expect(page.getByText('0000 0000 0000 1234', { exact: true })).toHaveCount(0);
+  });
+}
+
+for (const width of [375, 1440]) {
+  test(`balance gates requisites and follows live updates at ${width}px`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 1000 });
+    let amount = '0';
+    await page.route('**/v1/cards/test-card', (route) =>
+      route.fulfill({
+        json: {
+          card: {
+            id: 'test-card',
+            cardTypeId: 'travel',
+            currency: 'USD',
+            status: 'CARD_STATUS_ACTIVE',
+            name: 'Для путешествий',
+            balance: { currency: 'USD', amount },
+          },
+          ...(amount !== '0'
+            ? {
+                requisites: {
+                  number: 'TEST-NUMBER',
+                  securityCode: 'TEST-CVV',
+                  expirationMonth: '09',
+                  expirationYear: '2030',
+                  holderName: 'TEST HOLDER',
+                },
+              }
+            : {}),
+        },
+      }),
+    );
+    await page.goto('/cabinet/card?id=test-card');
+    const reveal = page.getByRole('button', { name: 'Реквизиты карты', exact: true });
+    await reveal.focus();
+    await page.keyboard.press('Enter');
+    await expect(page.getByRole('status')).toContainText('Используйте кнопку «Пополнить» ниже.');
+    await expect(page.getByRole('button', { name: /Пополнить/ })).toHaveCount(1);
+    await expect(page.getByText('TEST-NUMBER', { exact: true })).toHaveCount(0);
+    await mkdir('artifacts/screenshots', { recursive: true });
+    await page.screenshot({
+      path: `artifacts/screenshots/card-balance-locked-${width}.png`,
+      fullPage: true,
+      animations: 'disabled',
+    });
+    const message = await page.getByRole('status').boundingBox();
+    const back = await page
+      .getByRole('status')
+      .evaluate((element) => element.closest('[class*="requisites"]')!.getBoundingClientRect().toJSON());
+    expect(message!.y + message!.height).toBeLessThanOrEqual(back.y + back.height);
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    const topup = page.getByRole('button', { name: 'Пополнить', exact: true });
+    await topup.click();
+    await expect(page.getByRole('dialog')).toBeVisible();
+    await page.keyboard.press('Escape');
+    await expect(page.getByRole('dialog')).toHaveCount(0);
+    await expect(topup).toBeFocused();
+    amount = '0.0001';
+    await page.evaluate(() => window.dispatchEvent(new Event('visibilitychange')));
+    await expect(page.getByText('TEST-NUMBER', { exact: true })).toBeVisible({ timeout: 20000 });
+    amount = '0';
+    await page.evaluate(() => window.dispatchEvent(new Event('visibilitychange')));
+    await expect(page.getByRole('status')).toContainText('Пополните карту', { timeout: 20000 });
+    await expect(page.getByText('TEST-NUMBER', { exact: true })).toHaveCount(0);
+    await page.getByRole('button', { name: 'Скрыть реквизиты', exact: true }).click();
+    await expect(reveal).toBeFocused();
   });
 }

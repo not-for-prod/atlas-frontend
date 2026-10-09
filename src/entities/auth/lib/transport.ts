@@ -13,7 +13,7 @@ export function authPath(suffix: string) {
   if (!tenant) throw new AuthRequestError('not_configured');
   return `/v1/tenants/${encodeURIComponent(tenant)}/auth/${suffix}`;
 }
-export async function request<T>(path: string, body?: unknown): Promise<T> {
+export async function request<T>(path: string, body?: unknown, signal?: AbortSignal): Promise<T> {
   let origin: string;
   try {
     origin = backendOrigin();
@@ -27,7 +27,7 @@ export async function request<T>(path: string, body?: unknown): Promise<T> {
       credentials: 'include',
       cache: 'no-store',
       redirect: 'error',
-      signal: AbortSignal.timeout(35000),
+      signal: AbortSignal.any([AbortSignal.timeout(35000), ...(signal ? [signal] : [])]),
       headers: {
         'X-Atlas-Session': 'cookie',
         ...(body === undefined ? {} : { 'Content-Type': 'application/json' }),
@@ -39,7 +39,10 @@ export async function request<T>(path: string, body?: unknown): Promise<T> {
   }
   if (!response.ok) {
     const text = await response.text();
-    if (response.status === 404 && path.startsWith('/auth/callback/')) {
+    if (
+      response.status === 404 &&
+      (path.startsWith('/auth/callback/') || path.startsWith(authPath('transactions/')))
+    ) {
       let payload: unknown;
       try {
         payload = JSON.parse(text);
@@ -49,8 +52,8 @@ export async function request<T>(path: string, body?: unknown): Promise<T> {
       if (
         payload &&
         typeof payload === 'object' &&
-        'error' in payload &&
-        payload.error === 'account_not_found'
+        (('error' in payload && payload.error === 'account_not_found') ||
+          ('message' in payload && payload.message === 'account_not_found'))
       )
         throw new AuthRequestError('account_not_found', 0, response.status);
     }

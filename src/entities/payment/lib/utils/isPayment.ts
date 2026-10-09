@@ -30,7 +30,14 @@ export function isPayment(value: unknown): value is Payment {
     ].includes(payment.status ?? '') &&
     !!payment.amount &&
     isMoney(payment.amount) &&
-    payment.amount.currency === (cardOperation ? 'USD' : 'USDT') &&
+    (cardOperation
+      ? payment.amount.currency === 'USD'
+      : payment.amount.currency === 'USDT' || (payment.amount.currency === 'USD' && crypto == null)) &&
+    (payment.requisite?.sbp == null ||
+      (crypto == null &&
+        payment.amount.currency === 'USD' &&
+        typeof payment.requisite.sbp.paymentUrl === 'string' &&
+        payment.requisite.sbp.paymentUrl.startsWith('https://'))) &&
     (!cardOperation ||
       (payment.requisite == null &&
         !!payment.fee &&

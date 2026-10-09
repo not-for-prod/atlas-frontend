@@ -1,19 +1,27 @@
 import { Decimal } from '~/shared/lib/decimal';
-import { IconCreditCard } from '@tabler/icons-react';
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
-import { formatPaymentMoney, paymentStatusMessage, UsdtTronIcon, type Payment } from '~/entities/payment';
+import {
+  formatPaymentMoney,
+  paymentStatusMessage,
+  PaymentIcon,
+  isSbpPayment,
+  type Payment,
+} from '~/entities/payment';
 import styles from './PaymentHistoryRow.module.css';
 
 export function PaymentHistoryRow({ payment, onSelect }: { payment: Payment; onSelect: () => void }) {
   const intl = useIntl();
   const cardOperation =
     payment.type === 'PAYMENT_TYPE_CARD_ISSUE' || payment.type === 'PAYMENT_TYPE_CARD_TOP_UP';
+  const sbp = isSbpPayment(payment);
   const operationMessage =
     payment.type === 'PAYMENT_TYPE_CARD_TOP_UP'
       ? 'history.cardTopUp'
       : cardOperation
         ? 'history.cardIssue'
-        : 'history.deposit';
+        : sbp
+          ? 'history.sbpDeposit'
+          : 'history.deposit';
   const incoming = !cardOperation && payment.status === 'PAYMENT_STATUS_COMPLETED';
   const charged =
     cardOperation &&
@@ -43,7 +51,7 @@ export function PaymentHistoryRow({ payment, onSelect }: { payment: Payment; onS
           },
         )}
       />
-      {cardOperation ? <IconCreditCard size={40} aria-hidden="true" /> : <UsdtTronIcon />}
+      <PaymentIcon payment={payment} size={cardOperation ? 40 : 44} />
       <div className={styles.description}>
         <p className={styles.title}>
           <FormattedMessage id={operationMessage} />
@@ -53,6 +61,8 @@ export function PaymentHistoryRow({ payment, onSelect }: { payment: Payment; onS
             <FormattedMessage
               id={payment.status === 'PAYMENT_STATUS_PENDING' ? 'payment.reserved' : 'payment.charged'}
             />
+          ) : sbp ? (
+            <FormattedMessage id="history.sbpMethod" />
           ) : address ? (
             `${address.slice(0, 6)}…${address.slice(-5)}`
           ) : (
@@ -61,7 +71,11 @@ export function PaymentHistoryRow({ payment, onSelect }: { payment: Payment; onS
         </p>
         {!completed && (
           <p className={failed ? styles.failed : styles.status}>
-            <FormattedMessage id={paymentStatusMessage(payment.status)} />
+            {cardOperation ? (
+              <FormattedMessage id="payment.statusValue" values={{ status: payment.status }} />
+            ) : (
+              <FormattedMessage id={paymentStatusMessage(payment.status, sbp ? 'sbp' : 'crypto')} />
+            )}
           </p>
         )}
       </div>

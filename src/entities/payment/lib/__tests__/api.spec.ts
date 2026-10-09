@@ -184,3 +184,28 @@ it('loads mixed deposit, issuance and card top-up history and top-up details', a
   await expect(listPayments('')).resolves.toEqual(page);
   await expect(getPayment(cardOperation.id)).resolves.toEqual(cardOperation);
 });
+
+it.each(['PAYMENT_STATUS_PENDING', 'PAYMENT_STATUS_COMPLETED', 'PAYMENT_STATUS_FAILED'])(
+  'loads mixed crypto and SBP history and SBP detail with status %s',
+  async (status) => {
+    const sbp = {
+      id: 'sbp:order',
+      type: 'PAYMENT_TYPE_DEPOSIT',
+      status,
+      createdAt: '2026-10-07T14:54:33.543275Z',
+      updatedAt: '2026-10-07T14:59:33.543274Z',
+      amount: { currency: 'USD', amount: '100.25' },
+      requisite: null,
+      creditedAmount: status === 'PAYMENT_STATUS_COMPLETED' ? { currency: 'USD', amount: '100.25' } : null,
+    };
+    const page = { payments: [receipt, sbp] };
+    const fetcher = vi
+      .fn()
+      .mockResolvedValueOnce(new Response(JSON.stringify(page)))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ payment: sbp })));
+    vi.stubGlobal('fetch', fetcher);
+    await expect(listPayments('')).resolves.toEqual(page);
+    await expect(getPayment(sbp.id)).resolves.toEqual(sbp);
+    expect(fetcher.mock.calls[1][0]).toContain('/v1/payments/sbp%3Aorder');
+  },
+);

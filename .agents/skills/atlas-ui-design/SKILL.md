@@ -15,7 +15,7 @@ Keep account funds, reservations and card balance visually distinct. Hide sensit
 
 Use visible action text when a sensitive-data reveal could be confused with nearby refresh or visibility controls. Do not rely on a rotation glyph to communicate what data the action reveals.
 
-Use native interactive semantics, accessible labels, visible focus and sufficient contrast. Verify at 375px and desktop, including keyboard modal opening, Escape and focus return. Respect reduced motion. Keep visual review evidence in ignored `artifacts/` and record outcomes in docs when handing off a milestone.
+Use native interactive semantics, accessible labels, visible focus and sufficient contrast. For progress indicators embedded in colored surfaces, use the surface’s contrasting foreground for completed segments and a muted treatment for remaining segments; verify both against every supported palette. Verify at 375px and desktop, including keyboard modal opening, Escape and focus return. Respect reduced motion. Keep visual review evidence in ignored `artifacts/` and record outcomes in docs when handing off a milestone.
 
 Use shared spacing tokens for page gutters, panel padding and section gaps. Check cumulative page-plus-panel insets at 375px. Keep balance summaries compact: use tight label/amount spacing and an inline, wrapping row for secondary details instead of a separate divider and note footer. Keep cabinet headings, action tiles and decorative card artwork compact so balances, actions and recent activity remain easy to scan; promotional hero proportions belong on the landing page. On mobile, recompose navigation and artwork instead of simply stacking the desktop layout. Consolidate repeated unavailable tariff terms into one visible section notice.
 
@@ -80,3 +80,5 @@ Give payment details an explicitly labeled, readable status badge. Place refresh
 For one-time identity or onboarding collection, show status and a start action in the profile. Collect sensitive details in a modal; after submission, replace the action with submission status rather than keeping an editable profile form or redisplaying collected personal data.
 
 Keep paired modal footer actions aligned with equal control heights and widths. Stack them at narrow widths when the longer label cannot fit comfortably in two columns.
+
+When a gated view points to an existing nearby action, keep the explanation in the view and reuse that action. Avoid adding a second equivalent control inside the view unless it provides distinct behavior.

@@ -20,9 +20,15 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
+  AtlasPaymentV1CreateSbpPaymentRequest,
+  AtlasPaymentV1CreateSbpPaymentResponse,
   AtlasPaymentV1DepositRequest,
   AtlasPaymentV1DepositResponse,
   AtlasPaymentV1GetPaymentResponse,
+  AtlasPaymentV1GetSbpPaymentQrResponse,
+  AtlasPaymentV1GetSbpPaymentResponse,
+  AtlasPaymentV1GetSbpPreviewRequest,
+  AtlasPaymentV1GetSbpPreviewResponse,
   AtlasPaymentV1GetTariffResponse,
   AtlasPaymentV1ListBalancesResponse,
   AtlasPaymentV1ListPaymentsResponse,
@@ -772,6 +778,482 @@ export function usePaymentServiceGetTariff<TData = Awaited<ReturnType<typeof pay
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
   const queryOptions = getPaymentServiceGetTariffQueryOptions(options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export type paymentServiceGetSbpPreviewResponse200 = {
+  data: AtlasPaymentV1GetSbpPreviewResponse
+  status: 200
+}
+
+export type paymentServiceGetSbpPreviewResponseDefault = {
+  data: GoogleRpcStatus
+  status: Exclude<HTTPStatusCodes, 200>
+}
+
+export type paymentServiceGetSbpPreviewResponseSuccess = (paymentServiceGetSbpPreviewResponse200) & {
+  headers: Headers;
+};
+export type paymentServiceGetSbpPreviewResponseError = (paymentServiceGetSbpPreviewResponseDefault) & {
+  headers: Headers;
+};
+
+export type paymentServiceGetSbpPreviewResponse = (paymentServiceGetSbpPreviewResponseSuccess | paymentServiceGetSbpPreviewResponseError)
+
+export const getPaymentServiceGetSbpPreviewUrl = () => {
+
+
+
+
+  return `/v1/payments/sbp/previews`
+}
+
+/**
+ * @summary GetSbpPreview quotes a RUB payment for 30 seconds.
+ */
+export const paymentServiceGetSbpPreview = async (atlasPaymentV1GetSbpPreviewRequest: AtlasPaymentV1GetSbpPreviewRequest, options?: RequestInit): Promise<paymentServiceGetSbpPreviewResponse> => {
+
+  return kyMutator<paymentServiceGetSbpPreviewResponse>(getPaymentServiceGetSbpPreviewUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(atlasPaymentV1GetSbpPreviewRequest)
+  }
+);}
+
+
+
+
+
+export const getPaymentServiceGetSbpPreviewQueryKey = (atlasPaymentV1GetSbpPreviewRequest?: BodyType<AtlasPaymentV1GetSbpPreviewRequest>,) => {
+    return [
+    'POST', `/v1/payments/sbp/previews`, atlasPaymentV1GetSbpPreviewRequest
+    ] as const;
+    }
+
+
+export const getPaymentServiceGetSbpPreviewQueryOptions = <TData = Awaited<ReturnType<typeof paymentServiceGetSbpPreview>>, TError = ErrorType<GoogleRpcStatus>>(atlasPaymentV1GetSbpPreviewRequest: BodyType<AtlasPaymentV1GetSbpPreviewRequest>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentServiceGetSbpPreview>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getPaymentServiceGetSbpPreviewQueryKey(atlasPaymentV1GetSbpPreviewRequest);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof paymentServiceGetSbpPreview>>> = ({ signal }) => paymentServiceGetSbpPreview(atlasPaymentV1GetSbpPreviewRequest, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof paymentServiceGetSbpPreview>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type PaymentServiceGetSbpPreviewQueryResult = NonNullable<Awaited<ReturnType<typeof paymentServiceGetSbpPreview>>>
+export type PaymentServiceGetSbpPreviewQueryError = ErrorType<GoogleRpcStatus>
+
+
+export function usePaymentServiceGetSbpPreview<TData = Awaited<ReturnType<typeof paymentServiceGetSbpPreview>>, TError = ErrorType<GoogleRpcStatus>>(
+ atlasPaymentV1GetSbpPreviewRequest: BodyType<AtlasPaymentV1GetSbpPreviewRequest>, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentServiceGetSbpPreview>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof paymentServiceGetSbpPreview>>,
+          TError,
+          Awaited<ReturnType<typeof paymentServiceGetSbpPreview>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePaymentServiceGetSbpPreview<TData = Awaited<ReturnType<typeof paymentServiceGetSbpPreview>>, TError = ErrorType<GoogleRpcStatus>>(
+ atlasPaymentV1GetSbpPreviewRequest: BodyType<AtlasPaymentV1GetSbpPreviewRequest>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentServiceGetSbpPreview>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof paymentServiceGetSbpPreview>>,
+          TError,
+          Awaited<ReturnType<typeof paymentServiceGetSbpPreview>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePaymentServiceGetSbpPreview<TData = Awaited<ReturnType<typeof paymentServiceGetSbpPreview>>, TError = ErrorType<GoogleRpcStatus>>(
+ atlasPaymentV1GetSbpPreviewRequest: BodyType<AtlasPaymentV1GetSbpPreviewRequest>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentServiceGetSbpPreview>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary GetSbpPreview quotes a RUB payment for 30 seconds.
+ */
+
+export function usePaymentServiceGetSbpPreview<TData = Awaited<ReturnType<typeof paymentServiceGetSbpPreview>>, TError = ErrorType<GoogleRpcStatus>>(
+ atlasPaymentV1GetSbpPreviewRequest: BodyType<AtlasPaymentV1GetSbpPreviewRequest>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentServiceGetSbpPreview>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getPaymentServiceGetSbpPreviewQueryOptions(atlasPaymentV1GetSbpPreviewRequest,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export type paymentServiceCreateSbpPaymentResponse200 = {
+  data: AtlasPaymentV1CreateSbpPaymentResponse
+  status: 200
+}
+
+export type paymentServiceCreateSbpPaymentResponseDefault = {
+  data: GoogleRpcStatus
+  status: Exclude<HTTPStatusCodes, 200>
+}
+
+export type paymentServiceCreateSbpPaymentResponseSuccess = (paymentServiceCreateSbpPaymentResponse200) & {
+  headers: Headers;
+};
+export type paymentServiceCreateSbpPaymentResponseError = (paymentServiceCreateSbpPaymentResponseDefault) & {
+  headers: Headers;
+};
+
+export type paymentServiceCreateSbpPaymentResponse = (paymentServiceCreateSbpPaymentResponseSuccess | paymentServiceCreateSbpPaymentResponseError)
+
+export const getPaymentServiceCreateSbpPaymentUrl = () => {
+
+
+
+
+  return `/v1/payments/sbp`
+}
+
+/**
+ * @summary CreateSbpPayment accepts an owned, unexpired preview once.
+ */
+export const paymentServiceCreateSbpPayment = async (atlasPaymentV1CreateSbpPaymentRequest: AtlasPaymentV1CreateSbpPaymentRequest, options?: RequestInit): Promise<paymentServiceCreateSbpPaymentResponse> => {
+
+  return kyMutator<paymentServiceCreateSbpPaymentResponse>(getPaymentServiceCreateSbpPaymentUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(atlasPaymentV1CreateSbpPaymentRequest)
+  }
+);}
+
+
+
+
+
+export const getPaymentServiceCreateSbpPaymentQueryKey = (atlasPaymentV1CreateSbpPaymentRequest?: BodyType<AtlasPaymentV1CreateSbpPaymentRequest>,) => {
+    return [
+    'POST', `/v1/payments/sbp`, atlasPaymentV1CreateSbpPaymentRequest
+    ] as const;
+    }
+
+
+export const getPaymentServiceCreateSbpPaymentQueryOptions = <TData = Awaited<ReturnType<typeof paymentServiceCreateSbpPayment>>, TError = ErrorType<GoogleRpcStatus>>(atlasPaymentV1CreateSbpPaymentRequest: BodyType<AtlasPaymentV1CreateSbpPaymentRequest>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentServiceCreateSbpPayment>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getPaymentServiceCreateSbpPaymentQueryKey(atlasPaymentV1CreateSbpPaymentRequest);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof paymentServiceCreateSbpPayment>>> = ({ signal }) => paymentServiceCreateSbpPayment(atlasPaymentV1CreateSbpPaymentRequest, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof paymentServiceCreateSbpPayment>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type PaymentServiceCreateSbpPaymentQueryResult = NonNullable<Awaited<ReturnType<typeof paymentServiceCreateSbpPayment>>>
+export type PaymentServiceCreateSbpPaymentQueryError = ErrorType<GoogleRpcStatus>
+
+
+export function usePaymentServiceCreateSbpPayment<TData = Awaited<ReturnType<typeof paymentServiceCreateSbpPayment>>, TError = ErrorType<GoogleRpcStatus>>(
+ atlasPaymentV1CreateSbpPaymentRequest: BodyType<AtlasPaymentV1CreateSbpPaymentRequest>, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentServiceCreateSbpPayment>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof paymentServiceCreateSbpPayment>>,
+          TError,
+          Awaited<ReturnType<typeof paymentServiceCreateSbpPayment>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePaymentServiceCreateSbpPayment<TData = Awaited<ReturnType<typeof paymentServiceCreateSbpPayment>>, TError = ErrorType<GoogleRpcStatus>>(
+ atlasPaymentV1CreateSbpPaymentRequest: BodyType<AtlasPaymentV1CreateSbpPaymentRequest>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentServiceCreateSbpPayment>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof paymentServiceCreateSbpPayment>>,
+          TError,
+          Awaited<ReturnType<typeof paymentServiceCreateSbpPayment>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePaymentServiceCreateSbpPayment<TData = Awaited<ReturnType<typeof paymentServiceCreateSbpPayment>>, TError = ErrorType<GoogleRpcStatus>>(
+ atlasPaymentV1CreateSbpPaymentRequest: BodyType<AtlasPaymentV1CreateSbpPaymentRequest>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentServiceCreateSbpPayment>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary CreateSbpPayment accepts an owned, unexpired preview once.
+ */
+
+export function usePaymentServiceCreateSbpPayment<TData = Awaited<ReturnType<typeof paymentServiceCreateSbpPayment>>, TError = ErrorType<GoogleRpcStatus>>(
+ atlasPaymentV1CreateSbpPaymentRequest: BodyType<AtlasPaymentV1CreateSbpPaymentRequest>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentServiceCreateSbpPayment>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getPaymentServiceCreateSbpPaymentQueryOptions(atlasPaymentV1CreateSbpPaymentRequest,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export type paymentServiceGetSbpPaymentResponse200 = {
+  data: AtlasPaymentV1GetSbpPaymentResponse
+  status: 200
+}
+
+export type paymentServiceGetSbpPaymentResponseDefault = {
+  data: GoogleRpcStatus
+  status: Exclude<HTTPStatusCodes, 200>
+}
+
+export type paymentServiceGetSbpPaymentResponseSuccess = (paymentServiceGetSbpPaymentResponse200) & {
+  headers: Headers;
+};
+export type paymentServiceGetSbpPaymentResponseError = (paymentServiceGetSbpPaymentResponseDefault) & {
+  headers: Headers;
+};
+
+export type paymentServiceGetSbpPaymentResponse = (paymentServiceGetSbpPaymentResponseSuccess | paymentServiceGetSbpPaymentResponseError)
+
+export const getPaymentServiceGetSbpPaymentUrl = (paymentId: string,) => {
+
+
+
+
+  return `/v1/payments/sbp/${paymentId}`
+}
+
+/**
+ * @summary GetSbpPayment returns the owned collection outcome.
+ */
+export const paymentServiceGetSbpPayment = async (paymentId: string, options?: RequestInit): Promise<paymentServiceGetSbpPaymentResponse> => {
+
+  return kyMutator<paymentServiceGetSbpPaymentResponse>(getPaymentServiceGetSbpPaymentUrl(paymentId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getPaymentServiceGetSbpPaymentQueryKey = (paymentId: string,) => {
+    return [
+    `/v1/payments/sbp/${paymentId}`
+    ] as const;
+    }
+
+
+export const getPaymentServiceGetSbpPaymentQueryOptions = <TData = Awaited<ReturnType<typeof paymentServiceGetSbpPayment>>, TError = ErrorType<GoogleRpcStatus>>(paymentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentServiceGetSbpPayment>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getPaymentServiceGetSbpPaymentQueryKey(paymentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof paymentServiceGetSbpPayment>>> = ({ signal }) => paymentServiceGetSbpPayment(paymentId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: paymentId !== null && paymentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof paymentServiceGetSbpPayment>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type PaymentServiceGetSbpPaymentQueryResult = NonNullable<Awaited<ReturnType<typeof paymentServiceGetSbpPayment>>>
+export type PaymentServiceGetSbpPaymentQueryError = ErrorType<GoogleRpcStatus>
+
+
+export function usePaymentServiceGetSbpPayment<TData = Awaited<ReturnType<typeof paymentServiceGetSbpPayment>>, TError = ErrorType<GoogleRpcStatus>>(
+ paymentId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentServiceGetSbpPayment>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof paymentServiceGetSbpPayment>>,
+          TError,
+          Awaited<ReturnType<typeof paymentServiceGetSbpPayment>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePaymentServiceGetSbpPayment<TData = Awaited<ReturnType<typeof paymentServiceGetSbpPayment>>, TError = ErrorType<GoogleRpcStatus>>(
+ paymentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentServiceGetSbpPayment>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof paymentServiceGetSbpPayment>>,
+          TError,
+          Awaited<ReturnType<typeof paymentServiceGetSbpPayment>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePaymentServiceGetSbpPayment<TData = Awaited<ReturnType<typeof paymentServiceGetSbpPayment>>, TError = ErrorType<GoogleRpcStatus>>(
+ paymentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentServiceGetSbpPayment>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary GetSbpPayment returns the owned collection outcome.
+ */
+
+export function usePaymentServiceGetSbpPayment<TData = Awaited<ReturnType<typeof paymentServiceGetSbpPayment>>, TError = ErrorType<GoogleRpcStatus>>(
+ paymentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentServiceGetSbpPayment>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getPaymentServiceGetSbpPaymentQueryOptions(paymentId,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export type paymentServiceGetSbpPaymentQrResponse200 = {
+  data: AtlasPaymentV1GetSbpPaymentQrResponse
+  status: 200
+}
+
+export type paymentServiceGetSbpPaymentQrResponseDefault = {
+  data: GoogleRpcStatus
+  status: Exclude<HTTPStatusCodes, 200>
+}
+
+export type paymentServiceGetSbpPaymentQrResponseSuccess = (paymentServiceGetSbpPaymentQrResponse200) & {
+  headers: Headers;
+};
+export type paymentServiceGetSbpPaymentQrResponseError = (paymentServiceGetSbpPaymentQrResponseDefault) & {
+  headers: Headers;
+};
+
+export type paymentServiceGetSbpPaymentQrResponse = (paymentServiceGetSbpPaymentQrResponseSuccess | paymentServiceGetSbpPaymentQrResponseError)
+
+export const getPaymentServiceGetSbpPaymentQrUrl = (paymentId: string,) => {
+
+
+
+
+  return `/v1/payments/sbp/${paymentId}/qr`
+}
+
+/**
+ * @summary GetSbpPaymentQr reads direct QR access for an owned payment without creating one.
+ */
+export const paymentServiceGetSbpPaymentQr = async (paymentId: string, options?: RequestInit): Promise<paymentServiceGetSbpPaymentQrResponse> => {
+
+  return kyMutator<paymentServiceGetSbpPaymentQrResponse>(getPaymentServiceGetSbpPaymentQrUrl(paymentId),
+  {
+    ...options,
+    method: 'GET'
+
+
+  }
+);}
+
+
+
+
+
+export const getPaymentServiceGetSbpPaymentQrQueryKey = (paymentId: string,) => {
+    return [
+    `/v1/payments/sbp/${paymentId}/qr`
+    ] as const;
+    }
+
+
+export const getPaymentServiceGetSbpPaymentQrQueryOptions = <TData = Awaited<ReturnType<typeof paymentServiceGetSbpPaymentQr>>, TError = ErrorType<GoogleRpcStatus>>(paymentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentServiceGetSbpPaymentQr>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getPaymentServiceGetSbpPaymentQrQueryKey(paymentId);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof paymentServiceGetSbpPaymentQr>>> = ({ signal }) => paymentServiceGetSbpPaymentQr(paymentId, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, enabled: paymentId !== null && paymentId !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof paymentServiceGetSbpPaymentQr>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type PaymentServiceGetSbpPaymentQrQueryResult = NonNullable<Awaited<ReturnType<typeof paymentServiceGetSbpPaymentQr>>>
+export type PaymentServiceGetSbpPaymentQrQueryError = ErrorType<GoogleRpcStatus>
+
+
+export function usePaymentServiceGetSbpPaymentQr<TData = Awaited<ReturnType<typeof paymentServiceGetSbpPaymentQr>>, TError = ErrorType<GoogleRpcStatus>>(
+ paymentId: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentServiceGetSbpPaymentQr>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof paymentServiceGetSbpPaymentQr>>,
+          TError,
+          Awaited<ReturnType<typeof paymentServiceGetSbpPaymentQr>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePaymentServiceGetSbpPaymentQr<TData = Awaited<ReturnType<typeof paymentServiceGetSbpPaymentQr>>, TError = ErrorType<GoogleRpcStatus>>(
+ paymentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentServiceGetSbpPaymentQr>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof paymentServiceGetSbpPaymentQr>>,
+          TError,
+          Awaited<ReturnType<typeof paymentServiceGetSbpPaymentQr>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function usePaymentServiceGetSbpPaymentQr<TData = Awaited<ReturnType<typeof paymentServiceGetSbpPaymentQr>>, TError = ErrorType<GoogleRpcStatus>>(
+ paymentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentServiceGetSbpPaymentQr>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary GetSbpPaymentQr reads direct QR access for an owned payment without creating one.
+ */
+
+export function usePaymentServiceGetSbpPaymentQr<TData = Awaited<ReturnType<typeof paymentServiceGetSbpPaymentQr>>, TError = ErrorType<GoogleRpcStatus>>(
+ paymentId: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof paymentServiceGetSbpPaymentQr>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getPaymentServiceGetSbpPaymentQrQueryOptions(paymentId,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

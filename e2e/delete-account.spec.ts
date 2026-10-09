@@ -25,7 +25,7 @@ for (const width of [375, 1440]) {
     await expect(page).toHaveURL(/intent=delete/);
     await expect(page.getByRole('heading', { name: 'Удаление аккаунта', exact: true })).toBeVisible();
     await page.getByLabel('Электронная почта').fill('person@example.com');
-    await page.getByRole('button', { name: 'Получить код' }).click();
+    await page.getByRole('button', { name: 'Продолжить с email' }).click();
     await expect(page.getByLabel('Код из письма')).toBeVisible();
     await page.reload();
     await page.getByLabel('Код из письма').fill('000000');

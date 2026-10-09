@@ -1,5 +1,5 @@
 import { ActionIcon, Button, Group, Text } from '@mantine/core';
-import { IconEyeOff } from '@tabler/icons-react';
+import { IconEyeOff, IconLock } from '@tabler/icons-react';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { useCardRequisites } from './lib/hooks/useCardRequisites';
 import { RequisiteField } from './components/RequisiteField';
@@ -7,7 +7,7 @@ import { BillingAddressFields } from './components/BillingAddressFields';
 import styles from './RevealCard.module.css';
 
 export function RevealCard({ cardId, onHide }: { cardId: string; onHide?: () => void }) {
-  const { requisites, isPending, isError, retry } = useCardRequisites(cardId);
+  const { requisites, access, isPending, isError, retry } = useCardRequisites(cardId);
   const intl = useIntl();
   const number = requisites?.number;
   const formattedNumber = number && /^\d+$/.test(number) ? number.match(/.{1,4}/g)?.join(' ') : number;
@@ -48,6 +48,27 @@ export function RevealCard({ cardId, onHide }: { cardId: string; onHide?: () => 
           <div className={styles.message}>
             <Text size="inherit" role="alert">
               <FormattedMessage id="cabinet.card.requisitesError" />
+            </Text>
+            <Button variant="transparent" color="white" size="compact-xs" onClick={retry}>
+              <FormattedMessage id="cabinet.card.requisitesRetry" />
+            </Button>
+          </div>
+        ) : access === 'topup-required' ? (
+          <div className={styles.message} role="status">
+            <Group gap={6} wrap="nowrap">
+              <IconLock size={16} aria-hidden="true" />
+              <Text className={styles.lockedTitle}>
+                <FormattedMessage id="cabinet.card.topupToReveal" />
+              </Text>
+            </Group>
+            <Text className={styles.lockedCopy}>
+              <FormattedMessage id="cabinet.card.topupToRevealHint" />
+            </Text>
+          </div>
+        ) : access === 'balance-unavailable' ? (
+          <div className={styles.message}>
+            <Text size="inherit" role="status">
+              <FormattedMessage id="cabinet.card.requisitesBalanceUnavailable" />
             </Text>
             <Button variant="transparent" color="white" size="compact-xs" onClick={retry}>
               <FormattedMessage id="cabinet.card.requisitesRetry" />

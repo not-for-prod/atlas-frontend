@@ -1,0 +1,17 @@
+.amount,
+.value {
+  overflow-wrap: anywhere;
+  font-variant-numeric: tabular-nums;
+}
+
+.status {
+  height: auto;
+  max-width: 100%;
+  text-transform: none;
+  white-space: normal;
+}
+
+.statusLabel {
+  white-space: normal;
+  overflow: visible;
+}

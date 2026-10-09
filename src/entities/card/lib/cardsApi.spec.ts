@@ -2,9 +2,17 @@ import { afterEach, expect, it, vi } from 'vitest';
 import { getCard, getCardRequisites, listCards } from './cardsApi';
 vi.mock('~/shared/api/backendOrigin', () => ({ backendOrigin: () => 'https://atlas.test' }));
 afterEach(() => vi.unstubAllGlobals());
-const card = { id: 'card', cardTypeId: 'CATEGORY_TRAVEL', currency: 'USD', status: 'CARD_STATUS_ACTIVE' };
+const card = {
+  id: 'card',
+  cardTypeId: 'CATEGORY_TRAVEL',
+  currency: 'USD',
+  status: 'CARD_STATUS_ACTIVE',
+  balance: { amount: '0.0001', currency: 'USD' },
+};
 it('lists stored cards with cookies and leaves unavailable balances absent', async () => {
-  const fetcher = vi.fn().mockResolvedValue(Response.json({ cards: [card], nextPageToken: 'next' }));
+  const fetcher = vi
+    .fn()
+    .mockResolvedValue(Response.json({ cards: [{ ...card, balance: undefined }], nextPageToken: 'next' }));
   vi.stubGlobal('fetch', fetcher);
   const page = await listCards('');
   expect(page.cards?.[0].balance).toBeUndefined();
@@ -56,8 +64,8 @@ it('keeps ordinary detail reads free of requisites and preserves them only on ex
   );
   expect(await getCard('card')).not.toHaveProperty('requisites');
   expect(await getCardRequisites('card', new AbortController().signal)).toEqual({
-    number: 'TEST-NUMBER',
-    holderName: 'TEST HOLDER',
+    access: 'allowed',
+    requisites: { number: 'TEST-NUMBER', holderName: 'TEST HOLDER' },
   });
 });
 it('rejects malformed secret fields and mismatched ownership responses', async () => {
@@ -74,4 +82,26 @@ it('rejects malformed secret fields and mismatched ownership responses', async (
   await expect(getCardRequisites('another', new AbortController().signal)).rejects.toMatchObject({
     status: 503,
   });
+});
+
+it.each([
+  { balance: { amount: '0', currency: 'USD' }, access: 'topup-required' },
+  { balance: { amount: '0.00', currency: 'USD' }, access: 'topup-required' },
+  { balance: null, access: 'balance-unavailable' },
+  { balance: undefined, access: 'balance-unavailable' },
+])('withholds credentials with access $access for balance $balance', async ({ balance, access }) => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue(
+      Response.json({
+        card: { ...card, balance },
+        requisites: { number: 'TEST-NUMBER' },
+      }),
+    ),
+  );
+  expect(await getCardRequisites('card', new AbortController().signal)).toEqual({ access });
+});
+it('distinguishes a missing stored snapshot from a balance restriction', async () => {
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ card })));
+  expect(await getCardRequisites('card', new AbortController().signal)).toEqual({ access: 'allowed' });
 });

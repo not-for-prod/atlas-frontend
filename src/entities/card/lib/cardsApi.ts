@@ -1,4 +1,4 @@
-import { isDecimalAmount } from '~/shared/lib/decimal';
+import { Decimal, isDecimalAmount } from '~/shared/lib/decimal';
 import { backendOrigin } from '~/shared/api/backendOrigin';
 import {
   AtlasCardV1CardStatus,
@@ -68,11 +68,17 @@ export async function getCard(id: string, signal?: AbortSignal) {
 }
 
 // Explicit reveal reads bypass the query cache and remain local to the mounted feature.
-export async function getCardRequisites(id: string, signal: AbortSignal) {
+export type CardRequisitesRead = {
+  access: 'allowed' | 'topup-required' | 'balance-unavailable';
+  requisites?: CardRequisites;
+};
+export async function getCardRequisites(id: string, signal: AbortSignal): Promise<CardRequisitesRead> {
   const data: AtlasCardV1GetCardResponse = await requestCard(`/v1/cards/${encodeURIComponent(id)}`, signal);
   if (!isCard(data?.card) || data.card.id !== id) throw new CardRequestError(503);
+  if (data.card.balance == null) return { access: 'balance-unavailable' };
+  if (!new Decimal(data.card.balance.amount!).gt(0)) return { access: 'topup-required' };
   const requisites = data.requisites;
-  if (requisites == null) return undefined;
+  if (requisites == null) return { access: 'allowed' };
   if (
     typeof requisites !== 'object' ||
     Array.isArray(requisites) ||
@@ -100,6 +106,6 @@ export async function getCardRequisites(id: string, signal: AbortSignal) {
       ].some((value) => value !== undefined && typeof value !== 'string'))
   )
     throw new CardRequestError(503);
-  return requisites;
+  return { access: 'allowed', requisites };
 }
 export type CardRequisites = AtlasCardV1CardRequisites;

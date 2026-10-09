@@ -52,7 +52,7 @@ from wallet issuance/top-up payments. The card page shows provider types/statuse
 exact original-currency amounts, optional fees/settlement and transaction time. It uses
 card-scoped continuation tokens, 15-second visible-page refresh, manual refresh and retries,
 and clears history on session rejection/logout. Missing values are unavailable; provider
-failures never become empty success or fixtures. Rows do not open wallet payment details.
+failures never become empty success or fixtures. Rows open a card-operation detail modal from the current card-scoped history response, showing type, status, merchant, exact amount, optional fee/settlement, timestamp and full operation ID. Selection follows refreshed history data and is scoped to the selected card; missing values remain unavailable.
 Timestamps with explicit offsets are localized; other provider time text is preserved.
 Closure remains disabled; the obsolete unavailable-actions text is removed.
 Gateway and browser fixtures verify the contract, but authenticated live-provider history
@@ -61,3 +61,44 @@ and its page/time/order conventions still require a smoke read.
 Account balance top-up starts with a desired USD amount (positive, at most two fractional digits), then displays the payment preview and methods before requesting an address. The USDT/TRON preview follows the approved backend rule documented in `../atlas/docs/crypto-deposits.md`: 1:1 USD credit without an Atlas fee. Sender-wallet network fees are separate and unknown to Atlas; the receiving address must receive the displayed USDT amount. This is an indicative transfer calculation, not a locked quote or a payment order. The entered amount is not sent to the address endpoint; actual receipts determine balance credits. SBP remains unavailable. Payment tariff placeholders do not configure fees or activate methods.
 
 Payment-preview verification (2026-10-05): `bun lint`, all 219 unit/regression tests, and `bun run build` passed. Six focused deposit browser checks passed at 375px and 1440px, covering amount entry, preview, keyboard focus, Escape/focus return, unavailable-service retry and QR decoding. Screenshots are in ignored `artifacts/screenshots/deposit-{amount,preview}-{375,1440}.png`. The broader cabinet run passed history and legacy routing checks; its two navigation tests reached and passed the deposit checks but failed later at the unchanged profile notification-switch expectation in `e2e/cabinet.spec.ts:104`.
+
+Card requisites are gated by the backend on each detail request: only a successfully
+read positive live card balance permits number, CVV, expiry, holder and billing
+address. Zero balance shows a locked message on the existing card reverse and
+points to the existing top-up action below it, without a duplicate funding button.
+Unavailable balance offers retry and is never presented as zero. Reveal reads use
+the balance from that same response; credentials remain outside query/mutation
+caches. A changed card balance remounts the reveal feature, clearing credentials
+and fetching current permission. Confirmed top-ups already invalidate card detail
+queries; only a positive provider balance unlocks requisites.
+
+Balance-gated requisites verification (2026-10-06): frontend lint, all 227 unit
+tests, production build and all four card-requisites browser checks passed.
+The browser checks cover positive-balance reveal, zero-balance lock, live balance
+changes, one existing top-up action, modal Escape/focus return and card-hide focus
+at 375px and 1440px. Reviewed screenshots are in ignored
+`artifacts/screenshots/card-balance-locked-{375,1440}.png`. These are synthetic
+browser fixtures, not a live provider check. The UI skill now records the reusable
+rule to reuse an existing nearby action instead of adding an equivalent control.
+
+SBP account deposits are connected to POST `/v1/payments/sbp/previews`, POST `/v1/payments/sbp`, and GET `/v1/payments/sbp/{payment_id}`. Clients enter their desired USD top-up once, then select SBP. Selection automatically sends `usdAmount` to the preview endpoint, with no additional RUB form. The backend uses the Bybit RUB/USD rate and both tariffs to calculate the smallest payable RUB amount including the client fee. Rate, fee, provider cost and payable amount freeze together for 30 seconds; the frontend displays the returned quote and its USD credit. Focus and reconnect do not silently refresh it; an expired unaccepted quote requires explicit refresh before automatic admission. Selecting SBP automatically admits the valid quote once. Creation retries retain the same preview ID, including after a timeout; no automatic mutation retries run. The full HTTPS checkout link is opened with no referrer. Poll the saved order every five seconds while visible, stopping on completed/failed, and invalidate balance/history on confirmed completion. Payment confirmation does not claim completion of asynchronous balance credit. Backend-disabled responses remain explicit errors with no fixture fallback. Backend SBP requires live PayHot credentials, linked tariffs, migrations, authentication and Redis. PayHot browser requests omit optional payer IP; supplied IP values remain validated and Wata still requires a valid IP for new creations. Quote/payment references and checkout access are held only for the mounted flow; reload does not automatically resume an SBP order. Crypto fee, exchange-rate and network details appear only after explicit crypto selection.
+
+Direct SBP QR uses authenticated GET `/v1/payments/sbp/{payment_id}/qr`. It renders the exact NSPK URL locally, polls pending/preparation errors every five seconds while mounted and visible, and removes bank access at provider expiry or terminal payment status. Checkout remains the fallback. PayHot must enable direct access for the live key/register. Quote admission is automatic on SBP selection, with manual retry preserving the original preview after an unknown result. No automatic replacement order is created on QR expiry.
+
+SBP history uses PAYMENT_TYPE_DEPOSIT with frozen USD credit and no crypto requisite. Crypto history remains USDT with crypto funding instructions when present. The payment boundary accepts mixed history pages, while USD crypto instructions and malformed monetary values remain invalid. History and detail views share PaymentIcon, display the SBP logo and method label, and omit a separate Atlas fee for SBP. Completed SBP receipts expose creditedAmount; pending and failed receipts do not claim a balance credit.
+
+SBP history contract verification (2026-10-07): all 267 frontend tests and five focused payment-detail browser checks passed. Mixed crypto/SBP history, mobile/desktop rendering, failed receipt semantics, keyboard opening, Escape and focus restoration were checked. The corrected backend response omits crypto instructions for SBP and exposes confirmed credited money only after completion. The API-boundary skill now requires mixed-variant list/detail regression coverage; local skill validation passed. Browser fixtures are synthetic, not live payment-provider verification.
+
+Final frontend lint and production build passed for the SBP history contract correction. The running backend must load the updated list/detail mapper; no live backend process was restarted by this task.
+
+KYC phone clarification (2026-10-08): the collection form does not ask for or submit
+a phone number. Atlas generates a stable synthetic Russian-format `+7` number for
+provider KYC. The legacy API phone field is deprecated and ignored.
+
+## Profile email contract
+
+Implemented as host auth transport, outside the business OpenAPI client:
+GET `/auth/profile/email` returns `{email: string, verified: boolean}` and requires
+the current session. Linking uses existing transaction endpoints with
+`INTENT_UPDATE` and `email_code`. Deploy the backend migration and authorization
+library revision together before using this UI. A failed read is not absence.

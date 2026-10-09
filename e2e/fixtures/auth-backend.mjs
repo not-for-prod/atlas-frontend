@@ -8,7 +8,13 @@ const expiresAt = () => new Date(Date.now() + 300000).toISOString();
 const email = { requirementId: 'primary', methodId: 'email_code', providerId: '' };
 const google = { requirementId: 'primary', methodId: 'oauth', providerId: 'google' };
 function methods() {
-  return scenario.startsWith('oauth') ? [google] : scenario === 'empty' ? [] : [email];
+  return scenario === 'mixed'
+    ? [google, { ...google, providerId: 'telegram' }, email]
+    : scenario.startsWith('oauth')
+      ? [google]
+      : scenario === 'empty'
+        ? []
+        : [email];
 }
 createServer(async (req, res) => {
   const url = new URL(req.url, 'http://127.0.0.1:3112');

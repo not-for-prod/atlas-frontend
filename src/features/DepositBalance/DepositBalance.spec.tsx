@@ -23,7 +23,7 @@ function mount() {
     </MantineProvider>,
   );
 }
-it('starts with net USD, previews exact USDT and fees, and requests an address only after selection', async () => {
+it('shows crypto details and requests an address only after selecting crypto', async () => {
   vi.stubEnv('NEXT_PUBLIC_ATLAS_BACKEND_URL', 'http://localhost:8080');
   const fetcher = vi.fn().mockResolvedValue(
     new Response(
@@ -41,18 +41,23 @@ it('starts with net USD, previews exact USDT and fees, and requests an address o
   await user.type(input, '100,25');
   await user.click(screen.getByRole('button', { name: messages['deposit.continue'] }));
   expect(screen.getByText('100,25 $')).toBeVisible();
-  expect(screen.getByText('100,25 USDT')).toBeVisible();
-  expect(screen.getByText('0,00 $')).toBeVisible();
-  expect(screen.getByText(messages['deposit.networkFee'])).toBeVisible();
-  expect(screen.queryByRole('button', { name: /СБП/ })).not.toBeInTheDocument();
+  expect(screen.queryByText('100,25 USDT')).not.toBeInTheDocument();
+  expect(screen.queryByText('0,00 $')).not.toBeInTheDocument();
+  expect(screen.queryByText(messages['deposit.networkFee'])).not.toBeInTheDocument();
+  expect(screen.getByRole('button', { name: /СБП/ })).toBeVisible();
   expect(fetcher).not.toHaveBeenCalled();
   await user.click(screen.getByRole('button', { name: messages['deposit.editAmount'] }));
   expect(screen.getByLabelText(messages['deposit.amount'])).toHaveValue('100,25');
   await user.clear(screen.getByLabelText(messages['deposit.amount']));
   await user.type(screen.getByLabelText(messages['deposit.amount']), '90071992547409.93');
   await user.click(screen.getByRole('button', { name: messages['deposit.continue'] }));
-  expect(screen.getByText('90 071 992 547 409,93 USDT')).toBeVisible();
+  expect(screen.queryByText('90 071 992 547 409,93 USDT')).not.toBeInTheDocument();
   await user.click(screen.getByRole('button', { name: /Получить адрес/ }));
+  expect(screen.getByText('90 071 992 547 409,93 USDT')).toBeVisible();
+  expect(screen.queryByRole('button', { name: /СБП/ })).not.toBeInTheDocument();
+  expect(screen.getByRole('heading', { name: 'USDT' })).toHaveFocus();
+  expect(screen.getByText('0,00 $')).toBeVisible();
+  expect(screen.getByText(messages['deposit.networkFee'])).toBeVisible();
   expect(await screen.findByDisplayValue('destination')).toBeVisible();
   expect(fetcher).toHaveBeenCalledTimes(1);
   expect(JSON.parse(fetcher.mock.calls[0][1].body)).toEqual({

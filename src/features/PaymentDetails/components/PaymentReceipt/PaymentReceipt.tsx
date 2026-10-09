@@ -1,19 +1,21 @@
 import { Decimal } from '~/shared/lib/decimal';
-import { IconCreditCard } from '@tabler/icons-react';
 import { FormattedDate, FormattedMessage } from 'react-intl';
-import { formatPaymentMoney, UsdtTronIcon, type Payment } from '~/entities/payment';
+import { formatPaymentMoney, PaymentIcon, isSbpPayment, type Payment } from '~/entities/payment';
 import styles from './PaymentReceipt.module.css';
 
 export function PaymentReceipt({ payment }: { payment: Payment }) {
   const crypto = payment.requisite?.crypto;
   const cardOperation =
     payment.type === 'PAYMENT_TYPE_CARD_ISSUE' || payment.type === 'PAYMENT_TYPE_CARD_TOP_UP';
+  const sbp = isSbpPayment(payment);
   const operationMessage =
     payment.type === 'PAYMENT_TYPE_CARD_TOP_UP'
       ? 'history.cardTopUp'
       : cardOperation
         ? 'history.cardIssue'
-        : 'history.deposit';
+        : sbp
+          ? 'history.sbpDeposit'
+          : 'history.deposit';
   const incoming = !cardOperation && payment.status === 'PAYMENT_STATUS_COMPLETED';
   const charged =
     cardOperation &&
@@ -22,7 +24,7 @@ export function PaymentReceipt({ payment }: { payment: Payment }) {
   return (
     <div>
       <div className={styles.summary}>
-        {cardOperation ? <IconCreditCard size={52} aria-hidden="true" /> : <UsdtTronIcon size={52} />}
+        <PaymentIcon payment={payment} size={52} />
         <p className={styles.amount} data-completed={incoming}>
           {incoming ? '+' : charged ? '−' : ''}
           {formatPaymentMoney(payment.amount)}
@@ -47,12 +49,14 @@ export function PaymentReceipt({ payment }: { payment: Payment }) {
             <FormattedMessage id={operationMessage} />
           </dd>
         </div>
-        <div>
-          <dt>
-            <FormattedMessage id="payment.fee" />
-          </dt>
-          <dd>{formatPaymentMoney(payment.fee) ?? <FormattedMessage id="payment.notProvided" />}</dd>
-        </div>
+        {!sbp && (
+          <div>
+            <dt>
+              <FormattedMessage id="payment.fee" />
+            </dt>
+            <dd>{formatPaymentMoney(payment.fee) ?? <FormattedMessage id="payment.notProvided" />}</dd>
+          </div>
+        )}
         {cardOperation ? (
           <>
             <div>

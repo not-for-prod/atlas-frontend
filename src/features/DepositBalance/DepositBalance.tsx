@@ -1,25 +1,28 @@
 'use client';
 import { useEffect, useRef, useState } from 'react';
-import { Badge, Button, Group, Stack, Text, TextInput, Title } from '@mantine/core';
+import { Button, Group, Stack, Text, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
-import { IconArrowLeft } from '@tabler/icons-react';
+import { IconArrowLeft, IconChevronRight } from '@tabler/icons-react';
 import Image from 'next/image';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { CryptoDeposit } from '~/features/CryptoDeposit';
 import { formatUsd } from '~/entities/client-asset';
+import { UsdtTronIcon } from '~/entities/payment';
 import { PaymentMethodRow } from '~/shared/ui/PaymentMethodRow';
+import { SbpDeposit } from './components/SbpDeposit';
 import { PaymentPreview } from './components/PaymentPreview';
 import { parseDepositAmount } from './lib/utils/parseDepositAmount';
 import styles from './DepositBalance.module.css';
 
 export function DepositBalance({ onClose }: { onClose: () => void }) {
   const intl = useIntl();
+  const [method, setMethod] = useState<'sbp' | 'crypto'>();
   const [amount, setAmount] = useState<string>();
   const inputRef = useRef<HTMLInputElement>(null);
-  const previewRef = useRef<HTMLHeadingElement>(null);
+  const editAmountRef = useRef<HTMLButtonElement>(null);
   useEffect(() => {
-    (amount ? previewRef.current : inputRef.current)?.focus();
-  }, [amount]);
+    (amount ? editAmountRef.current : inputRef.current)?.focus();
+  }, [amount, method]);
   const form = useForm({
     initialValues: { amount: '' },
     validate: {
@@ -27,6 +30,17 @@ export function DepositBalance({ onClose }: { onClose: () => void }) {
         parseDepositAmount(value) ? null : intl.formatMessage({ id: 'deposit.invalidAmount' }),
     },
   });
+
+  if (method === 'sbp' && amount)
+    return <SbpDeposit amount={amount} onBack={() => setMethod(undefined)} onClose={onClose} />;
+  if (method === 'crypto' && amount)
+    return (
+      <CryptoDeposit
+        onClose={onClose}
+        onBack={() => setMethod(undefined)}
+        preview={<PaymentPreview amount={amount} />}
+      />
+    );
 
   if (!amount)
     return (
@@ -62,6 +76,7 @@ export function DepositBalance({ onClose }: { onClose: () => void }) {
           </Text>
         </Stack>
         <Button
+          ref={editAmountRef}
           variant="subtle"
           color="dark"
           leftSection={<IconArrowLeft size={16} />}
@@ -70,20 +85,26 @@ export function DepositBalance({ onClose }: { onClose: () => void }) {
           <FormattedMessage id="deposit.editAmount" />
         </Button>
       </Group>
-      <Title ref={previewRef} tabIndex={-1} order={2} size="h4">
-        <FormattedMessage id="deposit.preview" />
-      </Title>
       <ul className={styles.methods}>
-        <CryptoDeposit onClose={onClose} preview={<PaymentPreview amount={amount} />} />
+        <PaymentMethodRow
+          icon={<UsdtTronIcon size={32} />}
+          title={<FormattedMessage id="cabinet.deposit.crypto" />}
+          description={<FormattedMessage id="crypto.methodNote" />}
+          onSelect={() => setMethod('crypto')}
+          selectionLabel={
+            intl.formatMessage({ id: 'cabinet.deposit.crypto' }) +
+            ' — ' +
+            intl.formatMessage({ id: 'crypto.generate' })
+          }
+          action={<IconChevronRight size={22} aria-hidden="true" />}
+        />
         <PaymentMethodRow
           icon={<Image src="/payment-methods/sbp.svg" width={28} height={32} alt="" />}
           title={<FormattedMessage id="cabinet.deposit.bank" />}
-          description={<FormattedMessage id="crypto.bankUnavailable" />}
-          action={
-            <Badge color="gray" variant="light" size="lg">
-              <FormattedMessage id="cabinet.deposit.unavailable" />
-            </Badge>
-          }
+          description={<FormattedMessage id="sbp.methodNote" />}
+          onSelect={() => setMethod('sbp')}
+          selectionLabel={intl.formatMessage({ id: 'cabinet.deposit.bank' })}
+          action={<IconChevronRight size={22} aria-hidden="true" />}
         />
       </ul>
     </Stack>

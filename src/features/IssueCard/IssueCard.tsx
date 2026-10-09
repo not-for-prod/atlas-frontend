@@ -39,6 +39,7 @@ export function IssueCard({
   if (flow.issue)
     return (
       <Stack aria-live="polite">
+        <Text>{flow.issue.name}</Text>
         <Alert
           color={
             flow.issue.status === 'CARD_ISSUE_STATUS_COMPLETED'
@@ -51,7 +52,6 @@ export function IssueCard({
           <FormattedMessage id={`issuance.${flow.issue.status}`} />
         </Alert>
         <IssueProgress issue={flow.issue} />
-        <Text>{flow.issue.name}</Text>
         <Text>
           <FormattedMessage id="issuance.price" />: {formatUsd(flow.issue.price!.amount!)}
         </Text>

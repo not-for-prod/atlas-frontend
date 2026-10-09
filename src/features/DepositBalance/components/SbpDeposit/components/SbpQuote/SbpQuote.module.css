@@ -1,0 +1,15 @@
+.timer {
+  font-variant-numeric: tabular-nums;
+}
+
+.amount {
+  font-size: clamp(28px, 5vw, 36px);
+  line-height: 1.2;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+.credit {
+  padding-block: var(--mantine-spacing-md);
+  border-block: 1px solid var(--mantine-color-gray-3);
+}

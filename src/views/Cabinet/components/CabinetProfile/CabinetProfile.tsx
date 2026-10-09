@@ -2,6 +2,7 @@
 import { SimpleGrid, Stack, Text, Title } from '@mantine/core';
 import { FormattedMessage } from 'react-intl';
 import { NotificationSettings } from '~/features/NotificationSettings';
+import { ProfileEmail } from '~/features/ProfileEmail';
 import { ProfileKYC } from '~/features/ProfileKYC';
 import { DemoAction } from '~/features/DemoAction';
 import { TelegramSupport } from '~/features/TelegramSupport';
@@ -11,6 +12,9 @@ import styles from '../../Cabinet.module.css';
 export function CabinetProfile() {
   return (
     <Stack gap="lg">
+      <Stack className={styles.panel}>
+        <ProfileEmail />
+      </Stack>
       <Stack className={styles.panel}>
         <ProfileKYC />
       </Stack>

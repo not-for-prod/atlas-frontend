@@ -6,6 +6,7 @@ import { ActionIcon, Button, Group, Loader, Stack, Text, Title } from '@mantine/
 import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import { usePayments, PaymentRequestError, groupPaymentsByDate } from '~/entities/payment';
 import { useCardOperations, CardRequestError, groupCardOperationsByDate } from '~/entities/card';
+import { CardOperationDetails } from '~/features/CardOperationDetails';
 import { CardOperationRow } from './components/CardOperationRow';
 import { PaymentDetails } from '~/features/PaymentDetails';
 import { StatePanel } from '~/shared/ui/StatePanel';
@@ -25,6 +26,7 @@ export function PaymentHistory({
   const history = cardId ? cardHistory : accountHistory;
   const intl = useIntl();
   const [selectedPaymentId, setSelectedPaymentId] = useState<string | null>(null);
+  const [selectedOperation, setSelectedOperation] = useState<{ cardId: string; id: string } | null>(null);
   const sentinel = useRef<HTMLDivElement>(null);
   const { hasNextPage, isFetching, isError, fetchNextPage, data } = history;
   useEffect(() => {
@@ -84,6 +86,16 @@ export function PaymentHistory({
   ];
   return (
     <Stack>
+      {cardId && !unavailableMessage && (
+        <CardOperationDetails
+          operation={
+            selectedOperation?.cardId === cardId
+              ? (operations.find((operation) => operation.id === selectedOperation.id) ?? null)
+              : null
+          }
+          onClose={() => setSelectedOperation(null)}
+        />
+      )}
       {!cardId && <PaymentDetails paymentId={selectedPaymentId} onClose={() => setSelectedPaymentId(null)} />}
       <Group justify="space-between" wrap="nowrap">
         <Title order={2} size="h3">
@@ -142,7 +154,11 @@ export function PaymentHistory({
                   </Title>
                   <ul className={styles.list}>
                     {group.operations.map((operation) => (
-                      <CardOperationRow key={operation.id} operation={operation} />
+                      <CardOperationRow
+                        key={operation.id}
+                        operation={operation}
+                        onSelect={() => setSelectedOperation({ cardId, id: operation.id! })}
+                      />
                     ))}
                   </ul>
                 </section>

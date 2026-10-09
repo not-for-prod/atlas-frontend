@@ -53,3 +53,23 @@ it('rejects a card top-up mislabeled as a USD crypto deposit', () => {
     }),
   ).toBe(false);
 });
+
+it.each(['PAYMENT_STATUS_PENDING', 'PAYMENT_STATUS_COMPLETED', 'PAYMENT_STATUS_FAILED'])(
+  'accepts an SBP USD receipt with status %s and no crypto instructions',
+  (status) => {
+    const payment = {
+      id: 'sbp:order',
+      type: 'PAYMENT_TYPE_DEPOSIT',
+      status,
+      createdAt: '2026-10-07T14:54:33.543275Z',
+      amount: { currency: 'USD', amount: '100.25' },
+      requisite: null,
+    };
+    expect(isPayment(payment)).toBe(true);
+    expect(isPayment({ ...payment, amount: { currency: 'USD', amount: 100.25 } })).toBe(false);
+    expect(isPayment({ ...payment, amount: { currency: 'RUB', amount: '9928.03' } })).toBe(false);
+    expect(
+      isPayment({ ...payment, requisite: { crypto: { currency: 'USD', network: '', address: '' } } }),
+    ).toBe(false);
+  },
+);

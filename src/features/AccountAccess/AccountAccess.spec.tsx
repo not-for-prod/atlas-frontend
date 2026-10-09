@@ -6,6 +6,7 @@ import { IntlProvider } from 'react-intl';
 import messages from '../../../dictionaries/ru.json';
 import { ProfileKYC } from '~/features/ProfileKYC';
 import { authApi } from '~/entities/auth';
+import type * as AuthModule from '~/entities/auth';
 import { WalletBalance } from '~/entities/client-asset';
 import { PaymentHistory } from '~/widgets/PaymentHistory';
 import { BalanceVisibilityProvider } from '~/shared/ui/BalanceVisibilityProvider';
@@ -13,7 +14,10 @@ import { AccountAccess } from './AccountAccess';
 
 const router = vi.hoisted(() => ({ replace: vi.fn() }));
 vi.mock('next/navigation', () => ({ useRouter: () => router }));
-vi.mock('~/entities/auth', () => ({ authApi: { session: vi.fn() } }));
+vi.mock('~/entities/auth', async (importOriginal) => ({
+  ...(await importOriginal<typeof AuthModule>()),
+  authApi: { session: vi.fn() },
+}));
 afterEach(() => {
   cleanup();
   vi.unstubAllGlobals();

@@ -17,7 +17,9 @@ export function useLogout() {
       client.removeQueries({ queryKey: ['auth', 'deletion'] });
       const filters = {
         predicate: (query: { queryKey: readonly unknown[] }) =>
-          ['client-asset', 'payment', 'kyc', 'card', 'notification'].includes(String(query.queryKey[0])),
+          ['profile-email', 'client-asset', 'payment', 'kyc', 'card', 'notification'].includes(
+            String(query.queryKey[0]),
+          ),
       };
       await client.cancelQueries(filters);
       client.removeQueries(filters);

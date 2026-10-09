@@ -24,7 +24,7 @@ for (const width of [375, 1440]) {
       fullPage: true,
     });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
-    await page.getByRole('button', { name: 'Получить код' }).click();
+    await page.getByRole('button', { name: 'Продолжить с email' }).click();
     await expect(page.getByLabel('Код из письма')).toBeVisible();
     await page.reload();
     await page.getByLabel('Код из письма').fill('000000');
@@ -80,7 +80,7 @@ test('rate limiting does not automatically repeat email dispatch', async ({ page
   });
   await page.goto('/account');
   await page.getByLabel('Электронная почта').fill('person@example.com');
-  await page.getByRole('button', { name: 'Получить код' }).click();
+  await page.getByRole('button', { name: 'Продолжить с email' }).click();
   await expect(page.getByRole('main').getByRole('alert')).toContainText('Слишком много попыток');
   await expect(page.getByRole('main').getByRole('alert')).toContainText('60 сек.');
   expect(starts).toBe(1);
@@ -92,7 +92,7 @@ test('partial verification requires another backend step instead of announcing s
   await request.get('http://127.0.0.1:3112/__test/reset?scenario=partial');
   await page.goto('/account');
   await page.getByLabel('Электронная почта').fill('person@example.com');
-  await page.getByRole('button', { name: 'Получить код' }).click();
+  await page.getByRole('button', { name: 'Продолжить с email' }).click();
   await page.getByLabel('Код из письма').fill('123456');
   await page.getByRole('button', { name: 'Подтвердить код' }).click();
   await expect(page.getByText('Продолжите подтверждение, чтобы завершить вход.')).toBeVisible();
@@ -102,7 +102,7 @@ test('account initialization polls only until the client becomes available', asy
   await request.get('http://127.0.0.1:3112/__test/reset?scenario=initializing');
   await page.goto('/account');
   await page.getByLabel('Электронная почта').fill('person@example.com');
-  await page.getByRole('button', { name: 'Получить код' }).click();
+  await page.getByRole('button', { name: 'Продолжить с email' }).click();
   await page.getByLabel('Код из письма').fill('123456');
   await page.getByRole('button', { name: 'Подтвердить код' }).click();
   await expect(page.getByRole('status')).toHaveText('Готовим ваш аккаунт');
@@ -195,3 +195,37 @@ test('unknown OAuth account offers explicit registration and starts a fresh sign
   await expect(page).toHaveURL(/\/cabinet\?tariff=CATEGORY_TRAVEL$/);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('Мои карты');
 });
+
+for (const width of [375, 1440]) {
+  test(`email-first login layout at ${width}px continues directly to code`, async ({ page, request }) => {
+    await request.get('http://127.0.0.1:3112/__test/reset?scenario=mixed');
+    await page.setViewportSize({ width, height: 1000 });
+    await page.goto('/account');
+    const email = page.getByLabel('Электронная почта');
+    const submit = page.getByRole('button', { name: 'Продолжить с email' });
+    const google = page.getByRole('button', { name: 'Продолжить с Google' });
+    const telegram = page.getByRole('button', { name: 'Продолжить с Telegram' });
+    await expect(email).toBeVisible();
+    await expect(telegram).toBeVisible();
+    const boxes = await Promise.all(
+      [email, submit, google, telegram].map((control) => control.boundingBox()),
+    );
+    for (let index = 1; index < boxes.length; index++) {
+      expect(boxes[index]!.y).toBeGreaterThanOrEqual(boxes[index - 1]!.y + boxes[index - 1]!.height);
+    }
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await email.focus();
+    await page.keyboard.press('Tab');
+    await expect(submit).toBeFocused();
+    await page.keyboard.press('Tab');
+    await expect(google).toBeFocused();
+    await page.keyboard.press('Tab');
+    await expect(telegram).toBeFocused();
+    await email.fill('person@example.com');
+    await mkdir('artifacts/screenshots', { recursive: true });
+    await page.screenshot({ path: `artifacts/screenshots/auth-email-first-${width}.png`, fullPage: true });
+    await email.press('Enter');
+    await expect(page.getByLabel('Код из письма')).toBeVisible();
+    await expect(google).toHaveCount(0);
+  });
+}

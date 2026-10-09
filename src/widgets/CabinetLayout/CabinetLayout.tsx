@@ -57,14 +57,6 @@ export function CabinetLayout({
           </Menu.Dropdown>
         </Menu>
       </header>
-      <aside className={styles.notice}>
-        <strong>
-          <FormattedMessage id="cabinet.notice.title" />
-        </strong>
-        <span>
-          <FormattedMessage id="cabinet.notice" />
-        </span>
-      </aside>
       <main id="main" tabIndex={-1} className={styles.main}>
         {children}
       </main>

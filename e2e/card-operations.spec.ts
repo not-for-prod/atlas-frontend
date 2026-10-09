@@ -16,6 +16,7 @@ const operation = {
   transactionTime: '2026-10-03T12:00:00Z',
   amount: { amount: '1234.123456', currency: 'EUR' },
   fee: { amount: '0', currency: 'USD' },
+  settlement: { amount: '1345.67', currency: 'USD' },
 };
 for (const width of [375, 1440]) {
   test(`actual card operation history at ${width}px`, async ({ page }) => {
@@ -50,6 +51,27 @@ for (const width of [375, 1440]) {
     await expect(page.getByText('Закрытие и информация по карте пока недоступны.')).toHaveCount(0);
     await expect(page.getByText('Refund merchant')).toBeVisible();
     expect(requested).toContain('next');
+    const row = page.getByRole('button', { name: 'Открыть операцию: Online merchant, purchase' });
+    await row.focus();
+    await page.keyboard.press('Enter');
+    const details = page.getByRole('dialog', { name: 'Детали операции по карте' });
+    await expect(details).toBeVisible();
+    await expect(details.getByText('purchase', { exact: true })).toBeVisible();
+    await expect(details.getByText('0,00 USD', { exact: true })).toBeVisible();
+    await expect(details.getByText('1 345,67 USD', { exact: true })).toBeVisible();
+    await page.screenshot({
+      path: `artifacts/card-operation-details-${width}.png`,
+      fullPage: true,
+      animations: 'disabled',
+    });
+    expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+    await page.keyboard.press('Escape');
+    await expect(details).toHaveCount(0);
+    await expect(row).toBeFocused();
+    await row.click();
+    await expect(details).toBeVisible();
+    await details.getByRole('button', { name: 'Понятно', exact: true }).click();
+    await expect(row).toBeFocused();
     const refresh = page.getByRole('button', { name: 'Обновить', exact: true });
     await refresh.focus();
     await page.keyboard.press('Enter');
@@ -62,7 +84,11 @@ for (const width of [375, 1440]) {
     await page.getByRole('button', { name: 'Повторить', exact: true }).click();
     await expect(page.getByRole('alert').filter({ hasText: 'Не удалось обновить историю' })).toHaveCount(0);
     await mkdir('artifacts/screenshots', { recursive: true });
-    await page.screenshot({ path: `artifacts/screenshots/card-operations-${width}.png`, fullPage: true });
+    await page.screenshot({
+      path: `artifacts/screenshots/card-operations-${width}.png`,
+      fullPage: true,
+      animations: 'disabled',
+    });
     expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
   });
 }

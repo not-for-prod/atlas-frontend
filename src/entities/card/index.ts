@@ -35,7 +35,7 @@ export {
 } from './lib/topUpApi';
 export { useCurrentTopUp } from './lib/hooks/useCurrentTopUp';
 
-export { getCardRequisites, type CardRequisites } from './lib/cardsApi';
+export { getCardRequisites, type CardRequisites, type CardRequisitesRead } from './lib/cardsApi';
 
 export { useCardOperations } from './lib/hooks/useCardOperations';
 export { type CardOperation } from './lib/operationsApi';

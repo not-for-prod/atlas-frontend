@@ -41,6 +41,7 @@ it('collects data once in a modal, keeps edits after failure, and closes after s
   const email = await screen.findByLabelText(messages['kyc.email'], { exact: false });
   expect(email).toHaveValue('');
   expect(screen.getByRole('dialog')).toBeVisible();
+  expect(screen.queryByLabelText(messages['kyc.phone'], { exact: false })).not.toBeInTheDocument();
   fireEvent.change(email, { target: { value: 'edited@example.com' } });
   const country = screen.getByRole('combobox', { name: new RegExp(messages['kyc.country']) });
   expect(country).toHaveValue('');
@@ -59,6 +60,7 @@ it('collects data once in a modal, keeps edits after failure, and closes after s
     data: { email: 'edited@example.com', passport: { issuingCountry: 'RU' } },
   });
   expect(JSON.parse(call![1]!.body as string)).not.toHaveProperty('level');
+  expect(JSON.parse(call![1]!.body as string)).not.toHaveProperty('data.phone');
   expect(screen.queryByRole('button', { name: messages['kyc.start'] })).not.toBeInTheDocument();
   expect(client.getQueryData(['kyc'])).toEqual({ level: 'KYC_LEVEL_UNVERIFIED' });
   expect(localStorage.length).toBe(0);

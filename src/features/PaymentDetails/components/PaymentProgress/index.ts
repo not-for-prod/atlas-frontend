@@ -1,1 +1,0 @@
-export { PaymentProgress } from './PaymentProgress';

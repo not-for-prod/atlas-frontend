@@ -1,9 +1,9 @@
 import { useEffect, useRef, useState } from 'react';
 import { useMutation } from '@tanstack/react-query';
-import { getCardRequisites, type CardRequisites } from '~/entities/card';
+import { getCardRequisites, type CardRequisitesRead } from '~/entities/card';
 
 export function useCardRequisites(id: string) {
-  const [requisites, setRequisites] = useState<CardRequisites>();
+  const [result, setResult] = useState<CardRequisitesRead>();
   const pending = useRef<AbortController | undefined>(undefined);
   const { mutate, isPending, isError } = useMutation({
     mutationKey: ['card', 'reveal', id],
@@ -13,10 +13,10 @@ export function useCardRequisites(id: string) {
       pending.current?.abort();
       const controller = new AbortController();
       pending.current = controller;
-      setRequisites(undefined);
+      setResult(undefined);
       try {
         const data = await getCardRequisites(id, controller.signal);
-        if (!controller.signal.aborted) setRequisites(data);
+        if (!controller.signal.aborted) setResult(data);
       } catch (error) {
         if (!controller.signal.aborted) throw error;
       }
@@ -27,5 +27,11 @@ export function useCardRequisites(id: string) {
     mutate();
     return () => pending.current?.abort();
   }, [id, mutate]);
-  return { requisites, isPending, isError, retry: () => mutate() };
+  return {
+    requisites: result?.requisites,
+    access: result?.access,
+    isPending: isPending || (!result && !isError),
+    isError,
+    retry: () => mutate(),
+  };
 }

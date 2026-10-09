@@ -257,3 +257,24 @@ it('retries a frozen OAuth deletion with its original callback association', asy
   );
   expect(readAuth('flow')).toBeUndefined();
 });
+
+it('distinguishes an unregistered verified account from an expired transaction', async () => {
+  const { request } = await import('../transport');
+  const path = '/v1/tenants/atlas/auth/transactions/tx:verifyMethod';
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue(Response.json({ code: 5, message: 'account_not_found' }, { status: 404 })),
+  );
+  await expect(request(path, { input: { code: '123456' } })).rejects.toMatchObject({
+    code: 'account_not_found',
+    status: 404,
+  });
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue(Response.json({ code: 5, message: 'NotFound' }, { status: 404 })),
+  );
+  await expect(request(path, { input: { code: '123456' } })).rejects.toMatchObject({
+    code: 'expired',
+    status: 404,
+  });
+});

@@ -87,6 +87,6 @@
 }
 
 .progress[data-compact] .segment[data-completed] {
-  background: var(--app-lime);
+  background: currentcolor;
   opacity: 1;
 }

@@ -8,7 +8,13 @@ import { RevealCard } from './RevealCard';
 
 vi.mock('~/shared/api/backendOrigin', () => ({ backendOrigin: () => 'https://atlas.test' }));
 afterEach(() => vi.unstubAllGlobals());
-const card = { id: 'card', cardTypeId: 'travel', currency: 'USD', status: 'CARD_STATUS_ACTIVE' };
+const card = {
+  id: 'card',
+  cardTypeId: 'travel',
+  currency: 'USD',
+  status: 'CARD_STATUS_ACTIVE',
+  balance: { amount: '0.0001', currency: 'USD' },
+};
 // Synthetic values only; these are not usable payment credentials.
 const requisites = {
   number: 'TEST-NUMBER',
@@ -150,5 +156,47 @@ it('reports clipboard failure without claiming successful copying', async () => 
   fireEvent.click(screen.getByRole('button', { name: messages['cabinet.card.copyNumber'] }));
   await screen.findByText(messages['cabinet.card.copyError']);
   expect(screen.queryByText(messages['cabinet.card.copied'])).not.toBeInTheDocument();
+  client.clear();
+});
+
+it.each(['0', '0.00'])(
+  'shows the approved locked card for balance %s without a second top-up action',
+  async (amount) => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        Response.json({
+          card: { ...card, balance: { amount, currency: 'USD' } },
+          requisites,
+        }),
+      ),
+    );
+    const { client } = setup();
+    await screen.findByText(messages['cabinet.card.topupToReveal']);
+    expect(screen.getByRole('status')).toHaveTextContent(messages['cabinet.card.topupToReveal']);
+    expect(screen.getByRole('status')).toHaveTextContent(messages['cabinet.card.topupToRevealHint']);
+    expect(screen.queryByText('TEST-NUMBER')).not.toBeInTheDocument();
+    expect(screen.queryByText('TEST ADDRESS')).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: /Пополнить/ })).not.toBeInTheDocument();
+    expect(screen.queryByRole('button', { name: messages['cabinet.card.copyCvv'] })).not.toBeInTheDocument();
+    expect(
+      screen.queryByRole('button', { name: messages['cabinet.card.requisitesRetry'] }),
+    ).not.toBeInTheDocument();
+    client.clear();
+  },
+);
+it('offers a fresh balance retry and reveals only after the backend returns a positive balance', async () => {
+  const fetcher = vi
+    .fn()
+    .mockResolvedValueOnce(Response.json({ card: { ...card, balance: null } }))
+    .mockResolvedValueOnce(Response.json({ card, requisites }));
+  vi.stubGlobal('fetch', fetcher);
+  const { client } = setup();
+  await screen.findByText(messages['cabinet.card.requisitesBalanceUnavailable']);
+  expect(screen.getByRole('status')).toHaveTextContent(messages['cabinet.card.requisitesBalanceUnavailable']);
+  expect(screen.queryByText(messages['cabinet.card.topupToReveal'])).not.toBeInTheDocument();
+  fireEvent.click(screen.getByRole('button', { name: messages['cabinet.card.requisitesRetry'] }));
+  expect(await screen.findByText('TEST-NUMBER')).toBeVisible();
+  expect(fetcher).toHaveBeenCalledTimes(2);
   client.clear();
 });

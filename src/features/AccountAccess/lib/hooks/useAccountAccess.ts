@@ -1,7 +1,7 @@
 import { useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useQuery, useQueryClient } from '@tanstack/react-query';
-import { authApi } from '~/entities/auth';
+import { authApi, ProfileEmailRequestError } from '~/entities/auth';
 import { BalanceRequestError } from '~/entities/client-asset';
 import { KYCRequestError } from '~/entities/kyc';
 import { CardRequestError } from '~/entities/card';
@@ -23,7 +23,8 @@ export function useAccountAccess() {
   useEffect(() => {
     const rejectSession = (error: unknown) => {
       if (
-        (error instanceof NotificationRequestError ||
+        (error instanceof ProfileEmailRequestError ||
+          error instanceof NotificationRequestError ||
           error instanceof BalanceRequestError ||
           error instanceof PaymentRequestError ||
           error instanceof KYCRequestError ||
@@ -50,6 +51,7 @@ export function useAccountAccess() {
     if (session.isPending || (session.data?.authenticated && !session.isError)) return;
     const filters = {
       predicate: (query: { queryKey: readonly unknown[] }) =>
+        query.queryKey[0] === 'profile-email' ||
         query.queryKey[0] === 'notification' ||
         query.queryKey[0] === 'payment' ||
         query.queryKey[0] === 'client-asset' ||

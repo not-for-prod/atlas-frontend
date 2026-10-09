@@ -1,0 +1,7 @@
+.qr {
+  background: white;
+  width: 200px;
+  height: 200px;
+  max-width: 100%;
+  flex-shrink: 0;
+}

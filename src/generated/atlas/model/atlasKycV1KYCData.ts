@@ -11,6 +11,7 @@ import type { AtlasKycV1Passport } from './atlasKycV1Passport';
  */
 export interface AtlasKycV1KYCData {
   email?: string;
+  /** Ignored. The backend generates a synthetic Russian-format KYC phone number. */
   phone?: string;
   firstName?: string;
   lastName?: string;

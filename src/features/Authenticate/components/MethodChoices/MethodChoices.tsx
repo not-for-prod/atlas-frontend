@@ -1,4 +1,4 @@
-import { Button, Divider, Stack, Text } from '@mantine/core';
+import { Button, Stack, Text } from '@mantine/core';
 import { IconArrowUpRight } from '@tabler/icons-react';
 import { FormattedMessage } from 'react-intl';
 import { choiceKey, type MethodSelection } from '~/entities/auth';
@@ -17,7 +17,10 @@ export function MethodChoices({
   const providers = choices.filter((choice) => choice.methodId !== 'email_code');
   const emailChoices = choices.filter((choice) => choice.methodId === 'email_code');
   return (
-    <Stack gap="lg">
+    <Stack gap="sm">
+      {emailChoices.map((choice) => (
+        <EmailForm key={choiceKey(choice)} pending={pending} onSubmit={(email) => onStart(choice, email)} />
+      ))}
       {providers.length > 0 && (
         <Stack gap="sm">
           {providers.map((choice) => (
@@ -34,17 +37,13 @@ export function MethodChoices({
               <FormattedMessage id={`auth.provider.${choice.providerId}`} />
             </Button>
           ))}
-          <Text className={styles.note}>
-            <FormattedMessage id="auth.provider.help" />
-          </Text>
         </Stack>
       )}
-      {providers.length > 0 && emailChoices.length > 0 && (
-        <Divider label={<FormattedMessage id="auth.email.alternative" />} labelPosition="center" />
+      {emailChoices.length === 0 && providers.length > 0 && (
+        <Text className={styles.note}>
+          <FormattedMessage id="auth.provider.help" />
+        </Text>
       )}
-      {emailChoices.map((choice) => (
-        <EmailForm key={choiceKey(choice)} pending={pending} onSubmit={(email) => onStart(choice, email)} />
-      ))}
       {choices.length === 0 && (
         <Text c="dimmed">
           <FormattedMessage id="auth.noMethods" />

@@ -1,1 +1,1 @@
-export { CodeForm } from './CodeForm';
+export { CodeForm } from '~/shared/ui/CodeForm';

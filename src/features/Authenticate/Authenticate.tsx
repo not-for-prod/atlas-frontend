@@ -40,6 +40,17 @@ export function Authenticate({
               id={`auth.error.${auth.error}`}
               defaultMessage="Не удалось продолжить. Попробуйте позже."
             />
+            {auth.error === 'account_not_found' &&
+              auth.intents.some((item) => item.intent === 'INTENT_SIGN_UP') && (
+                <Button
+                  variant="light"
+                  color="dark"
+                  disabled={auth.pending || auth.loading}
+                  onClick={() => selectIntent('INTENT_SIGN_UP')}
+                >
+                  <FormattedMessage id="auth.goToSignUp" />
+                </Button>
+              )}
             {auth.retryAfter > 0 && (
               <Text size="sm">
                 <FormattedMessage id="auth.retryAfter" values={{ seconds: auth.retryAfter }} />
@@ -139,9 +150,11 @@ export function Authenticate({
             </Stack>
           ) : (
             <>
-              <Text size="sm" c="dimmed">
-                <FormattedMessage id={transaction ? 'auth.nextStep' : 'auth.choose'} />
-              </Text>
+              {transaction && (
+                <Text size="sm" c="dimmed">
+                  <FormattedMessage id="auth.nextStep" />
+                </Text>
+              )}
               <MethodChoices
                 choices={auth.choices}
                 pending={auth.pending}

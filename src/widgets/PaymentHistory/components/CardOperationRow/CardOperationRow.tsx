@@ -1,9 +1,16 @@
 import { IconCreditCard } from '@tabler/icons-react';
-import { FormattedDate, FormattedMessage } from 'react-intl';
+import { FormattedDate, FormattedMessage, useIntl } from 'react-intl';
 import { cardOperationTime, formatCardOperationMoney, type CardOperation } from '~/entities/card';
 import styles from '../PaymentHistoryRow/PaymentHistoryRow.module.css';
 import operationStyles from './CardOperationRow.module.css';
-export function CardOperationRow({ operation }: { operation: CardOperation }) {
+export function CardOperationRow({
+  operation,
+  onSelect,
+}: {
+  operation: CardOperation;
+  onSelect: () => void;
+}) {
+  const intl = useIntl();
   const date = cardOperationTime(operation.transactionTime);
   const type = operation.type?.replace('CARD_OPERATION_TYPE_', '').toLowerCase() ?? 'unspecified';
   const status = operation.status?.replace('CARD_OPERATION_STATUS_', '').toLowerCase() ?? 'unspecified';
@@ -11,6 +18,19 @@ export function CardOperationRow({ operation }: { operation: CardOperation }) {
   const incoming = completed && ['refund', 'top_up'].includes(type);
   return (
     <li className={styles.row}>
+      <button
+        type="button"
+        className={styles.open}
+        onClick={onSelect}
+        aria-haspopup="dialog"
+        aria-label={intl.formatMessage(
+          { id: 'cardOperation.open' },
+          {
+            name: operation.merchantName || intl.formatMessage({ id: `cardOperation.type.${type}` }),
+            id: operation.id,
+          },
+        )}
+      />
       <IconCreditCard size={40} aria-hidden="true" />
       <div className={styles.description}>
         <p className={styles.title}>

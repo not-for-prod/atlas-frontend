@@ -1,9 +1,11 @@
 'use client';
-import { type ReactNode, useState } from 'react';
+import { type ReactNode, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { IconChevronRight, IconAlertCircle, IconCopy, IconCheck } from '@tabler/icons-react';
+import { IconArrowLeft, IconAlertCircle, IconCopy, IconCheck } from '@tabler/icons-react';
 import {
   Button,
+  Group,
+  Title,
   Stack,
   Text,
   TextInput,
@@ -15,14 +17,22 @@ import {
 } from '@mantine/core';
 import { QRCodeSVG } from 'qrcode.react';
 import styles from './CryptoDeposit.module.css';
-import { PaymentMethodRow } from '~/shared/ui/PaymentMethodRow';
 import { ActionTile } from '~/shared/ui/ActionTile';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { useCryptoAddress, PaymentRequestError, UsdtTronIcon } from '~/entities/payment';
-export function CryptoDeposit({ onClose, preview }: { onClose: () => void; preview?: ReactNode }) {
+import { useCryptoAddress, PaymentRequestError } from '~/entities/payment';
+export function CryptoDeposit({
+  onClose,
+  onBack,
+  preview,
+}: {
+  onClose: () => void;
+  onBack?: () => void;
+  preview?: ReactNode;
+}) {
   const intl = useIntl();
   const router = useRouter();
-  const [key, setKey] = useState<string>();
+  const key = useRef<string>(undefined);
+  const heading = useRef<HTMLHeadingElement>(null);
   const deposit = useCryptoAddress();
   const signIn = deposit.error instanceof PaymentRequestError && [401, 403].includes(deposit.error.status);
   const unknown =
@@ -34,41 +44,39 @@ export function CryptoDeposit({ onClose, preview }: { onClose: () => void; previ
       : deposit.error instanceof PaymentRequestError && deposit.error.status === 503
         ? 'crypto.unavailable'
         : 'crypto.failed';
-  function request() {
-    const requestKey = key ?? crypto.randomUUID();
-    setKey(requestKey);
-    deposit.mutate(requestKey);
-  }
+  const mutate = deposit.mutate;
+  const request = useCallback(() => {
+    const requestKey = key.current ?? crypto.randomUUID();
+    key.current = requestKey;
+    mutate(requestKey);
+  }, [mutate]);
+  useEffect(() => {
+    heading.current?.focus();
+    if (key.current) return;
+    const timer = setTimeout(request, 0);
+    return () => clearTimeout(timer);
+  }, [request]);
   return (
-    <PaymentMethodRow
-      icon={<UsdtTronIcon size={32} />}
-      title={<FormattedMessage id="cabinet.deposit.crypto" />}
-      description={<FormattedMessage id="crypto.methodNote" />}
-      onSelect={deposit.isSuccess ? undefined : signIn ? () => router.push('/account') : request}
-      selectionLabel={
-        intl.formatMessage({ id: 'cabinet.deposit.crypto' }) +
-        ' — ' +
-        intl.formatMessage({
-          id: signIn
-            ? 'auth.signIn'
-            : deposit.isError && !unknown
-              ? 'crypto.retry'
-              : key
-                ? 'crypto.check'
-                : 'crypto.generate',
-        })
-      }
-      loading={deposit.isPending}
-      action={
-        !deposit.isSuccess &&
-        (deposit.isPending ? (
-          <Loader size="sm" color="dark" />
-        ) : (
-          <IconChevronRight size={22} aria-hidden="true" />
-        ))
-      }
-    >
+    <Stack gap="lg">
+      <Group justify="space-between">
+        <Title ref={heading} tabIndex={-1} order={2} size="h4">
+          <FormattedMessage id="cabinet.deposit.crypto" />
+        </Title>
+        {onBack && (
+          <Button variant="subtle" color="dark" leftSection={<IconArrowLeft size={16} />} onClick={onBack}>
+            <FormattedMessage id="sbp.back" />
+          </Button>
+        )}
+      </Group>
       {preview}
+      {deposit.isPending && (
+        <Group role="status">
+          <Loader size="sm" color="dark" />
+          <Text>
+            <FormattedMessage id="crypto.generate" />
+          </Text>
+        </Group>
+      )}
       {deposit.isSuccess && (
         <Stack role="status">
           <QRCodeSVG
@@ -131,6 +139,6 @@ export function CryptoDeposit({ onClose, preview }: { onClose: () => void; previ
           </Stack>
         </Alert>
       )}
-    </PaymentMethodRow>
+    </Stack>
   );
 }

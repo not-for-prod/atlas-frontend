@@ -30,7 +30,7 @@ The isolated test backend implements credentialed CORS and HttpOnly cookies. Bro
 
 ## Auth page presentation
 
-The page uses a unified desktop card and a single-column mobile form. Provider buttons include decorative Google, Yandex, Mail.ru and Telegram icons, readable labels and redirect indicators; only backend-enabled methods are shown. Sign-in and registration remain separate actions. OAuth and email sections are separated when both are available.
+The page uses a unified desktop card and a single-column mobile form. Provider buttons include decorative Google, Yandex, Mail.ru and Telegram icons, readable labels and redirect indicators; only backend-enabled methods are shown. Sign-in and registration remain separate actions. Email appears first with a visible address field, a plain divider and «Продолжить с email», followed by the enabled provider buttons. Submitting the email starts the existing challenge and opens code verification directly. Passwordless helper text appears below the choices.
 
 The redesign was visually reviewed at 375px and 1440px. Browser checks cover icon visibility, keyboard activation, responsive overflow and the existing email/OAuth flows. Screenshots are saved in `artifacts/screenshots/auth-oauth-375.png` and `artifacts/screenshots/auth-oauth-1440.png`.
 
@@ -50,3 +50,22 @@ or bearer tokens. Commands are retried explicitly.
 Atlas retains clients, balances, cards and history. All later protected requests reject
 a missing canonical auth user. Registering again creates fresh ownership and zero
 balances. No provider account deletion, refund or card closure is triggered.
+
+## Profile email
+
+The profile Email section reads the authenticated `/auth/profile/email` contract:
+verified email or an explicit empty email with `verified: false`. Request failures
+show an error, never the add-email state. Existing email and trusted OAuth metadata
+are displayed without sending a code. OAuth metadata does not enable email login.
+
+Users without an email enter an address and code in the shared registration form
+controls. The feature uses authenticated `INTENT_UPDATE`, retains the original
+transaction/attempt references for retries, and shows success only after a protected
+read confirms persistence. No replacement session or signup navigation is required.
+An authentication rejection is checked against the protected read to distinguish
+wrong code from session loss. Private profile-email queries are cleared on logout
+and access loss; modal progress is local and discarded on cancellation/unmount.
+Resend uses the existing limiter and a visible cooldown. Email replacement/removal
+is outside this flow; KYC fields are independent.
+
+Email code confirmation returns HTTP 404 with `message: "account_not_found"` after a valid proof when no account exists. The UI displays the registration message and offers explicit sign-up. Generic transaction 404 errors retain the expired-flow message. Deploy this mapping with the authorization library update.

@@ -13,7 +13,6 @@ export function KYCForm({ onSaved, onCancel }: { onSaved: () => void; onCancel: 
     },
     initialValues: {
       email: '',
-      phone: '',
       firstName: '',
       lastName: '',
       middleName: '',
@@ -42,14 +41,6 @@ export function KYCForm({ onSaved, onCancel }: { onSaved: () => void; onCancel: 
             required
             maxLength={254}
             {...form.getInputProps('email')}
-          />
-          <TextInput
-            label={label('phone')}
-            type="tel"
-            placeholder="+79991234567"
-            required
-            pattern="\+[1-9][0-9]{6,14}"
-            {...form.getInputProps('phone')}
           />
           <TextInput
             label={label('firstName')}

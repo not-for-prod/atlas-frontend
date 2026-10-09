@@ -1,4 +1,4 @@
-import { Button, Stack, TextInput } from '@mantine/core';
+import { Button, Divider, Stack, TextInput } from '@mantine/core';
 import { useForm } from '@mantine/form';
 import { FormattedMessage, useIntl } from 'react-intl';
 export function EmailForm({ pending, onSubmit }: { pending: boolean; onSubmit: (email: string) => void }) {
@@ -16,7 +16,8 @@ export function EmailForm({ pending, onSubmit }: { pending: boolean; onSubmit: (
     <form onSubmit={form.onSubmit(({ email }) => onSubmit(email.trim()))}>
       <Stack gap="md">
         <TextInput
-          label={intl.formatMessage({ id: 'auth.email' })}
+          aria-label={intl.formatMessage({ id: 'auth.email' })}
+          placeholder="name@example.com"
           type="email"
           autoComplete="email"
           required
@@ -24,7 +25,8 @@ export function EmailForm({ pending, onSubmit }: { pending: boolean; onSubmit: (
           disabled={pending}
           {...form.getInputProps('email')}
         />
-        <Button type="submit" color="dark" loading={pending}>
+        <Divider aria-hidden="true" />
+        <Button fullWidth type="submit" color="dark" loading={pending}>
           <FormattedMessage id="auth.send" />
         </Button>
       </Stack>

@@ -1,12 +1,11 @@
 'use client';
 import Link from 'next/link';
 import { IconRefresh } from '@tabler/icons-react';
-import { ActionIcon, Alert, Button, Group, Modal, Stack, Tabs, Text } from '@mantine/core';
+import { ActionIcon, Alert, Button, Group, Modal, Stack, Text } from '@mantine/core';
 import { FormattedMessage, useIntl } from 'react-intl';
 import { PaymentRequestError, usePayment } from '~/entities/payment';
 import { StatePanel } from '~/shared/ui/StatePanel';
 import { PaymentReceipt } from './components/PaymentReceipt';
-import { PaymentProgress } from './components/PaymentProgress';
 
 export function PaymentDetails({ paymentId, onClose }: { paymentId: string | null; onClose: () => void }) {
   const intl = useIntl();
@@ -58,27 +57,7 @@ export function PaymentDetails({ paymentId, onClose }: { paymentId: string | nul
                   <FormattedMessage id="payment.refreshError" />
                 </Alert>
               )}
-              {detail.data &&
-                (detail.data.type === 'PAYMENT_TYPE_CARD_ISSUE' ? (
-                  <Tabs key={paymentId} defaultValue="details" keepMounted={false}>
-                    <Tabs.List>
-                      <Tabs.Tab value="details">
-                        <FormattedMessage id="payment.details" />
-                      </Tabs.Tab>
-                      <Tabs.Tab value="progress">
-                        <FormattedMessage id="payment.progress" />
-                      </Tabs.Tab>
-                    </Tabs.List>
-                    <Tabs.Panel value="details" pt="md">
-                      <PaymentReceipt payment={detail.data} />
-                    </Tabs.Panel>
-                    <Tabs.Panel value="progress" pt="md">
-                      <PaymentProgress payment={detail.data} />
-                    </Tabs.Panel>
-                  </Tabs>
-                ) : (
-                  <PaymentReceipt payment={detail.data} />
-                ))}
+              {detail.data && <PaymentReceipt payment={detail.data} />}
             </Stack>
           )}
         </Modal.Body>
