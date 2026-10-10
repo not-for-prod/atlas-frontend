@@ -1,21 +1,28 @@
 'use client';
 
 import { Decimal } from '~/shared/lib/decimal';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type ReactNode } from 'react';
 import { Alert, Button, Stack, Text, TextInput } from '@mantine/core';
 import { FormattedMessage } from 'react-intl';
 import { IssueProgress, type CardCategory } from '~/entities/card';
+import { useKYC } from '~/entities/kyc';
 import { formatUsd } from '~/entities/client-asset';
 import { useIssueCard } from './lib/hooks/useIssueCard';
 export function IssueCard({
   category,
   onLocked,
+  verification,
 }: {
   category?: CardCategory;
+  verification?: ReactNode;
   onLocked: (locked: boolean) => void;
 }) {
   const [name, setName] = useState('');
   const flow = useIssueCard();
+  const kyc = useKYC(
+    category?.id,
+    !!category?.requiresKyc && !flow.issue && !flow.loading && !flow.unavailable,
+  );
   useEffect(() => {
     onLocked(flow.locked || !!flow.issue);
   }, [flow.locked, flow.issue, onLocked]);
@@ -81,6 +88,14 @@ export function IssueCard({
       <Alert>
         <FormattedMessage id="issuance.unavailable" />
       </Alert>
+    );
+  if (category.requiresKyc && (kyc.isPending || kyc.isError || !kyc.data?.eligible))
+    return (
+      verification ?? (
+        <Alert>
+          <FormattedMessage id="kyc.required" />
+        </Alert>
+      )
     );
   return (
     <form

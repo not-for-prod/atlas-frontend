@@ -4,9 +4,16 @@ const config: NextConfig = {
   reactStrictMode: true,
   distDir: process.env.ATLAS_TEST_MODE === '1' ? '.next/verification' : '.next',
   devIndicators: false,
-  logging: { incomingRequests: { ignore: [/^\/auth\/callback\//] } },
+  logging: { incomingRequests: { ignore: [/^\/auth\/callback\//, /^\/kyc\/return/] } },
   async headers() {
     return [
+      {
+        source: '/kyc/return',
+        headers: [
+          { key: 'Referrer-Policy', value: 'no-referrer' },
+          { key: 'Cache-Control', value: 'no-store' },
+        ],
+      },
       {
         source: '/auth/callback/:provider',
         headers: [

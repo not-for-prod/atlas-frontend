@@ -55,3 +55,26 @@ it.each(['invalid', 42, ''])('still rejects malformed completed timestamps %s', 
   );
   await expect(getCurrentIssue()).rejects.toMatchObject({ status: 503 });
 });
+
+/** @tags kyc issuance @description Optional KYC removes only the identity step from server progress. */
+it('accepts issuance progress without an identity step', async () => {
+  const withoutKYC = {
+    ...issue,
+    steps: issue.steps.filter((step) => step.stage !== 'CARD_ISSUE_STAGE_VERIFYING_IDENTITY'),
+  };
+  vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ issue: withoutKYC })));
+  expect(await getCurrentIssue()).toEqual(withoutKYC);
+});
+it.each(['out-of-order', 'missing-funding', 'not-array'])(
+  'rejects malformed issuance steps: %s',
+  async (kind) => {
+    const steps =
+      kind === 'not-array'
+        ? {}
+        : kind === 'out-of-order'
+          ? [...issue.steps].reverse()
+          : issue.steps.filter((step) => step.stage !== 'CARD_ISSUE_STAGE_FUNDING_ACCOUNT');
+    vi.stubGlobal('fetch', vi.fn().mockResolvedValue(Response.json({ issue: { ...issue, steps } })));
+    await expect(getCurrentIssue()).rejects.toMatchObject({ status: 503 });
+  },
+);

@@ -22,12 +22,11 @@
       "description": "SupportService exposes public customer support contact information."
     },
     {
-      "name": "KYCService",
-      "description": "KYCService collects the authenticated client's identity data."
-    },
-    {
       "name": "NotificationService",
       "description": "NotificationService manages the authenticated client's Telegram notifications."
+    },
+    {
+      "name": "KYCService"
     }
   ],
   "consumes": ["application/json"],
@@ -651,37 +650,6 @@
         "tags": ["SupportService"]
       }
     },
-    "/v1/kyc": {
-      "put": {
-        "summary": "SaveKYC replaces collected data without starting or granting verification.",
-        "operationId": "KYCService_SaveKYC",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/atlas.kyc.v1.SaveKYCResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/atlas.kyc.v1.SaveKYCRequest"
-            }
-          }
-        ],
-        "tags": ["KYCService"]
-      }
-    },
     "/v1/card-issues/current": {
       "get": {
         "summary": "GetCurrentIssue restores an active issuance after a reload or lost response.",
@@ -841,27 +809,6 @@
           }
         ],
         "tags": ["VirtualCardService"]
-      }
-    },
-    "/v1/kyc/level": {
-      "get": {
-        "summary": "GetKYCLevel returns only the caller's server-owned verification level.",
-        "operationId": "KYCService_GetKYCLevel",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/atlas.kyc.v1.GetKYCLevelResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/google.rpc.Status"
-            }
-          }
-        },
-        "tags": ["KYCService"]
       }
     },
     "/v1/card-top-ups/{topUpId}": {
@@ -1112,6 +1059,94 @@
           }
         ],
         "tags": ["VirtualCardService"]
+      }
+    },
+    "/v1/kyc": {
+      "get": {
+        "operationId": "KYCService_GetKYCState",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.kyc.v1.GetKYCStateResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "cardTypeId",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          }
+        ],
+        "tags": ["KYCService"]
+      }
+    },
+    "/v1/kyc/contacts": {
+      "put": {
+        "operationId": "KYCService_SaveKYCContacts",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.kyc.v1.SaveKYCContactsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/atlas.kyc.v1.SaveKYCContactsRequest"
+            }
+          }
+        ],
+        "tags": ["KYCService"]
+      }
+    },
+    "/v1/kyc/verification": {
+      "post": {
+        "operationId": "KYCService_StartKYCVerification",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/atlas.kyc.v1.StartKYCVerificationResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/google.rpc.Status"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/atlas.kyc.v1.StartKYCVerificationRequest"
+            }
+          }
+        ],
+        "tags": ["KYCService"]
       }
     }
   },
@@ -1790,6 +1825,10 @@
         },
         "palette": {
           "$ref": "#/definitions/atlas.card.v1.CardPalette"
+        },
+        "requiresKyc": {
+          "type": "boolean",
+          "description": "Whether issuing this card requires KYC, regardless of the user's verification status."
         }
       },
       "description": "CardTariffCategory describes a configurable card type keyed by its stable string ID."
@@ -1966,327 +2005,6 @@
         }
       }
     },
-    "atlas.kyc.v1.KYCData": {
-      "type": "object",
-      "properties": {
-        "email": {
-          "type": "string"
-        },
-        "phone": {
-          "type": "string"
-        },
-        "firstName": {
-          "type": "string"
-        },
-        "lastName": {
-          "type": "string"
-        },
-        "middleName": {
-          "type": "string"
-        },
-        "birthDate": {
-          "type": "string",
-          "description": "Calendar date in YYYY-MM-DD format."
-        },
-        "passport": {
-          "$ref": "#/definitions/atlas.kyc.v1.Passport"
-        }
-      },
-      "description": "KYCData contains sensitive collected identity data. Never log this message."
-    },
-    "atlas.kyc.v1.KYCLevel": {
-      "type": "string",
-      "enum": ["KYC_LEVEL_UNSPECIFIED", "KYC_LEVEL_UNVERIFIED", "KYC_LEVEL_VERIFIED"],
-      "default": "KYC_LEVEL_UNSPECIFIED",
-      "description": "KYCLevel is local verification, not provider KYC status."
-    },
-    "atlas.kyc.v1.Passport": {
-      "type": "object",
-      "properties": {
-        "issuingCountry": {
-          "type": "string",
-          "enum": [
-            "AD",
-            "AE",
-            "AF",
-            "AG",
-            "AI",
-            "AL",
-            "AM",
-            "AO",
-            "AQ",
-            "AR",
-            "AS",
-            "AT",
-            "AU",
-            "AW",
-            "AX",
-            "AZ",
-            "BA",
-            "BB",
-            "BD",
-            "BE",
-            "BF",
-            "BG",
-            "BH",
-            "BI",
-            "BJ",
-            "BL",
-            "BM",
-            "BN",
-            "BO",
-            "BQ",
-            "BR",
-            "BS",
-            "BT",
-            "BV",
-            "BW",
-            "BY",
-            "BZ",
-            "CA",
-            "CC",
-            "CD",
-            "CF",
-            "CG",
-            "CH",
-            "CI",
-            "CK",
-            "CL",
-            "CM",
-            "CN",
-            "CO",
-            "CR",
-            "CU",
-            "CV",
-            "CW",
-            "CX",
-            "CY",
-            "CZ",
-            "DE",
-            "DJ",
-            "DK",
-            "DM",
-            "DO",
-            "DZ",
-            "EC",
-            "EE",
-            "EG",
-            "EH",
-            "ER",
-            "ES",
-            "ET",
-            "FI",
-            "FJ",
-            "FK",
-            "FM",
-            "FO",
-            "FR",
-            "GA",
-            "GB",
-            "GD",
-            "GE",
-            "GF",
-            "GG",
-            "GH",
-            "GI",
-            "GL",
-            "GM",
-            "GN",
-            "GP",
-            "GQ",
-            "GR",
-            "GS",
-            "GT",
-            "GU",
-            "GW",
-            "GY",
-            "HK",
-            "HM",
-            "HN",
-            "HR",
-            "HT",
-            "HU",
-            "ID",
-            "IE",
-            "IL",
-            "IM",
-            "IN",
-            "IO",
-            "IQ",
-            "IR",
-            "IS",
-            "IT",
-            "JE",
-            "JM",
-            "JO",
-            "JP",
-            "KE",
-            "KG",
-            "KH",
-            "KI",
-            "KM",
-            "KN",
-            "KP",
-            "KR",
-            "KW",
-            "KY",
-            "KZ",
-            "LA",
-            "LB",
-            "LC",
-            "LI",
-            "LK",
-            "LR",
-            "LS",
-            "LT",
-            "LU",
-            "LV",
-            "LY",
-            "MA",
-            "MC",
-            "MD",
-            "ME",
-            "MF",
-            "MG",
-            "MH",
-            "MK",
-            "ML",
-            "MM",
-            "MN",
-            "MO",
-            "MP",
-            "MQ",
-            "MR",
-            "MS",
-            "MT",
-            "MU",
-            "MV",
-            "MW",
-            "MX",
-            "MY",
-            "MZ",
-            "NA",
-            "NC",
-            "NE",
-            "NF",
-            "NG",
-            "NI",
-            "NL",
-            "NO",
-            "NP",
-            "NR",
-            "NU",
-            "NZ",
-            "OM",
-            "PA",
-            "PE",
-            "PF",
-            "PG",
-            "PH",
-            "PK",
-            "PL",
-            "PM",
-            "PN",
-            "PR",
-            "PS",
-            "PT",
-            "PW",
-            "PY",
-            "QA",
-            "RE",
-            "RO",
-            "RS",
-            "RU",
-            "RW",
-            "SA",
-            "SB",
-            "SC",
-            "SD",
-            "SE",
-            "SG",
-            "SH",
-            "SI",
-            "SJ",
-            "SK",
-            "SL",
-            "SM",
-            "SN",
-            "SO",
-            "SR",
-            "SS",
-            "ST",
-            "SV",
-            "SX",
-            "SY",
-            "SZ",
-            "TC",
-            "TD",
-            "TF",
-            "TG",
-            "TH",
-            "TJ",
-            "TK",
-            "TL",
-            "TM",
-            "TN",
-            "TO",
-            "TR",
-            "TT",
-            "TV",
-            "TW",
-            "TZ",
-            "UA",
-            "UG",
-            "UM",
-            "US",
-            "UY",
-            "UZ",
-            "VA",
-            "VC",
-            "VE",
-            "VG",
-            "VI",
-            "VN",
-            "VU",
-            "WF",
-            "WS",
-            "YE",
-            "YT",
-            "ZA",
-            "ZM",
-            "ZW"
-          ],
-          "description": "ISO 3166-1 country enum. String encoding preserves the original API and stored payloads.\nSource: https://data.iana.org/time-zones/tzdb/iso3166.tab (2026-09-29)."
-        },
-        "number": {
-          "type": "string"
-        },
-        "issueDate": {
-          "type": "string"
-        },
-        "expiryDate": {
-          "type": "string",
-          "description": "Empty when the document has no expiry."
-        }
-      },
-      "description": "Passport contains document details, without scans."
-    },
-    "atlas.kyc.v1.SaveKYCRequest": {
-      "type": "object",
-      "properties": {
-        "data": {
-          "$ref": "#/definitions/atlas.kyc.v1.KYCData"
-        }
-      }
-    },
-    "atlas.kyc.v1.SaveKYCResponse": {
-      "type": "object",
-      "properties": {
-        "level": {
-          "$ref": "#/definitions/atlas.kyc.v1.KYCLevel"
-        }
-      }
-    },
     "atlas.card.v1.CardIssue": {
       "type": "object",
       "properties": {
@@ -2434,14 +2152,6 @@
         }
       },
       "description": "CardPalette contains solid card colors, never arbitrary CSS."
-    },
-    "atlas.kyc.v1.GetKYCLevelResponse": {
-      "type": "object",
-      "properties": {
-        "level": {
-          "$ref": "#/definitions/atlas.kyc.v1.KYCLevel"
-        }
-      }
     },
     "atlas.card.v1.CardIssueStage": {
       "type": "string",
@@ -2798,6 +2508,112 @@
           "type": "string"
         }
       }
+    },
+    "atlas.kyc.v1.GetKYCStateResponse": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "$ref": "#/definitions/atlas.kyc.v1.KYCState"
+        }
+      }
+    },
+    "atlas.kyc.v1.KYCCheck": {
+      "type": "string",
+      "enum": [
+        "KYC_CHECK_UNSPECIFIED",
+        "KYC_CHECK_IDENTITY_DOCUMENT",
+        "KYC_CHECK_LIVENESS",
+        "KYC_CHECK_FACE_MATCH"
+      ],
+      "default": "KYC_CHECK_UNSPECIFIED"
+    },
+    "atlas.kyc.v1.KYCState": {
+      "type": "object",
+      "properties": {
+        "status": {
+          "$ref": "#/definitions/atlas.kyc.v1.VerificationStatus"
+        },
+        "passedChecks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/atlas.kyc.v1.KYCCheck"
+          }
+        },
+        "requiredChecks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/atlas.kyc.v1.KYCCheck"
+          }
+        },
+        "missingChecks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/atlas.kyc.v1.KYCCheck"
+          }
+        },
+        "contactsComplete": {
+          "type": "boolean"
+        },
+        "eligible": {
+          "type": "boolean"
+        },
+        "verificationUrl": {
+          "type": "string",
+          "description": "Sensitive URL for the authenticated owner. Never persist in browser storage."
+        },
+        "reason": {
+          "type": "string"
+        }
+      },
+      "description": "Only server-owned verification metadata; identity fields are never returned."
+    },
+    "atlas.kyc.v1.SaveKYCContactsRequest": {
+      "type": "object",
+      "properties": {
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "atlas.kyc.v1.SaveKYCContactsResponse": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "$ref": "#/definitions/atlas.kyc.v1.KYCState"
+        }
+      }
+    },
+    "atlas.kyc.v1.StartKYCVerificationRequest": {
+      "type": "object",
+      "properties": {
+        "cardTypeId": {
+          "type": "string"
+        }
+      }
+    },
+    "atlas.kyc.v1.StartKYCVerificationResponse": {
+      "type": "object",
+      "properties": {
+        "state": {
+          "$ref": "#/definitions/atlas.kyc.v1.KYCState"
+        }
+      }
+    },
+    "atlas.kyc.v1.VerificationStatus": {
+      "type": "string",
+      "enum": [
+        "VERIFICATION_STATUS_UNSPECIFIED",
+        "VERIFICATION_STATUS_NOT_STARTED",
+        "VERIFICATION_STATUS_STARTING",
+        "VERIFICATION_STATUS_AWAITING_USER",
+        "VERIFICATION_STATUS_IN_PROGRESS",
+        "VERIFICATION_STATUS_IN_REVIEW",
+        "VERIFICATION_STATUS_APPROVED",
+        "VERIFICATION_STATUS_DECLINED",
+        "VERIFICATION_STATUS_EXPIRED",
+        "VERIFICATION_STATUS_ACTION_REQUIRED"
+      ],
+      "default": "VERIFICATION_STATUS_UNSPECIFIED"
     }
   }
 }

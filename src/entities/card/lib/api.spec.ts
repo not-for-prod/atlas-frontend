@@ -9,6 +9,7 @@ const fixture = {
   categories: {
     CATEGORY_NEW: {
       description: '<b>Plain text</b>',
+      requiresKyc: false,
       fees: { issue: { fixed: '9007199254740993' }, deposit: { percent: '1.123456789012345678' } },
     },
   },
@@ -126,3 +127,32 @@ describe('configured card type presentation', () => {
     await expect(getCardTariff()).rejects.toMatchObject({ status: 503 });
   });
 });
+
+/** @tags kyc catalog @description Missing policy must never silently enable issuance without KYC. */
+it.each([true, false])('preserves the explicit requiresKyc=%s flag', async (requiresKyc) => {
+  vi.stubGlobal(
+    'fetch',
+    vi.fn().mockResolvedValue(
+      Response.json({
+        ...fixture,
+        categories: { travel: { ...fixture.categories.CATEGORY_NEW, requiresKyc } },
+      }),
+    ),
+  );
+  expect((await getCardTariff()).categories[0].requiresKyc).toBe(requiresKyc);
+});
+it.each([undefined, null, 'false'])(
+  'rejects a missing or malformed KYC requirement: %s',
+  async (requiresKyc) => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue(
+        Response.json({
+          ...fixture,
+          categories: { travel: { ...fixture.categories.CATEGORY_NEW, requiresKyc } },
+        }),
+      ),
+    );
+    await expect(getCardTariff()).rejects.toMatchObject({ status: 503 });
+  },
+);

@@ -17,4 +17,6 @@ export interface AtlasCardV1CardTariffCategory {
   topup?: AtlasCardV1CardTopUpLimits;
   name?: string;
   palette?: AtlasCardV1CardPalette;
+  /** Whether issuing this card requires KYC, regardless of the user's verification status. */
+  requiresKyc?: boolean;
 }

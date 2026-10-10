@@ -54,13 +54,18 @@ async function request(
     const stages = Object.values(AtlasCardV1CardIssueStage).filter(
       (stage) => stage !== 'CARD_ISSUE_STAGE_UNSPECIFIED',
     );
+    const expectedStages =
+      Array.isArray(issue.steps) &&
+      issue.steps.some((step) => step?.stage === 'CARD_ISSUE_STAGE_VERIFYING_IDENTITY')
+        ? stages
+        : stages.filter((stage) => stage !== 'CARD_ISSUE_STAGE_VERIFYING_IDENTITY');
     if (
       !Array.isArray(issue.steps) ||
-      ![stages.length, stages.length - 1].includes(issue.steps.length) ||
+      issue.steps.length !== expectedStages.length ||
       issue.steps.some(
         (step, index) =>
           !step ||
-          step.stage !== stages[index] ||
+          step.stage !== expectedStages[index] ||
           !step.status ||
           step.status === 'CARD_ISSUE_STEP_STATUS_UNSPECIFIED' ||
           !Object.values(AtlasCardV1CardIssueStepStatus).includes(step.status) ||

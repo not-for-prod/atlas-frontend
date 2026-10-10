@@ -4,8 +4,7 @@
  * authorization/v1/service.proto
  * OpenAPI spec version: version not set
  */
-import type { AtlasKycV1KYCData } from './atlasKycV1KYCData';
 
-export interface AtlasKycV1SaveKYCRequest {
-  data?: AtlasKycV1KYCData;
+export interface AtlasKycV1StartKYCVerificationRequest {
+  cardTypeId?: string;
 }

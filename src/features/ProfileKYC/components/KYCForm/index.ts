@@ -1,1 +1,0 @@
-export { KYCForm } from './KYCForm';

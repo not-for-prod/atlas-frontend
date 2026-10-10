@@ -123,7 +123,7 @@ it('hides KYC and clears private data when a KYC save rejects the session', asyn
       init?.method === 'PUT'
         ? new Response('', { status: 401 })
         : Response.json({
-            level: 'KYC_LEVEL_UNVERIFIED',
+            state: { status: 'VERIFICATION_STATUS_NOT_STARTED' },
           }),
     ),
   );
@@ -139,12 +139,12 @@ it('hides KYC and clears private data when a KYC save rejects the session', asyn
       </IntlProvider>
     </MantineProvider>,
   );
-  fireEvent.click(await screen.findByRole('button', { name: messages['kyc.start'] }));
+  fireEvent.click(await screen.findByRole('button', { name: messages['kyc.addContacts'] }));
   const email = await screen.findByLabelText(messages['kyc.email'], { exact: false });
-  fireEvent.change(screen.getByRole('combobox'), { target: { value: 'RU' } });
+  fireEvent.change(email, { target: { value: 'private@example.com' } });
   fireEvent.submit(email.closest('form')!);
   await waitFor(() => expect(router.replace).toHaveBeenCalledWith('/account'));
   expect(screen.queryByDisplayValue('private@example.com')).not.toBeInTheDocument();
-  expect(client.getQueryData(['kyc'])).toBeUndefined();
+  expect(client.getQueryData(['kyc', ''])).toBeUndefined();
   client.clear();
 });

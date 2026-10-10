@@ -3,6 +3,9 @@ import { test, expect } from './fixtures/cabinet';
 for (const width of [375, 1440]) {
   test(`explicit requisites reveal and reset at ${width}px`, async ({ page }) => {
     await page.setViewportSize({ width, height: 1000 });
+    await page.route('**/v1/cards/test-card/operations?*', (route) =>
+      route.fulfill({ json: { operations: [] } }),
+    );
     await page.route('**/v1/cards/test-card', (route) =>
       route.fulfill({
         json: {
@@ -39,6 +42,7 @@ for (const width of [375, 1440]) {
           categories: {
             travel: {
               name: 'Travel',
+              requiresKyc: false,
               palette: { background: '#cbf31a', foreground: '#1c2600' },
               fees: { issue_price: { fixed: '20' }, issue_commission: { fixed: '5' } },
             },

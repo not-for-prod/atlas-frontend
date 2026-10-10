@@ -56,6 +56,7 @@ for (const width of [375, 1440]) {
           categories: {
             CATEGORY_TRAVEL: {
               name: 'Особая карта',
+              requiresKyc: false,
               palette: { background: '#123456', foreground: '#ffffff' },
               fees: {},
             },

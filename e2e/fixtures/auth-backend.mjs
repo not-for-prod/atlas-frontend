@@ -56,6 +56,7 @@ createServer(async (req, res) => {
           id,
           {
             description,
+            requiresKyc: false,
             topup: { minimalAmount: '10', maximumAmount: '1000' },
             fees: {
               issue: { fixed: '20' },

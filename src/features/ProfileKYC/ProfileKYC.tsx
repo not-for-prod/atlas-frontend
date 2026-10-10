@@ -1,18 +1,19 @@
 'use client';
 import { useRef, useState } from 'react';
+import Link from 'next/link';
 import { useIsMutating } from '@tanstack/react-query';
-import { Alert, Badge, Button, Group, Loader, Modal, Stack, Text, Title } from '@mantine/core';
+import { Alert, Button, Loader, Modal, Stack, Text, Title } from '@mantine/core';
 import { FormattedMessage, useIntl } from 'react-intl';
-import { useKYC } from '~/entities/kyc';
-import { KYCForm } from './components/KYCForm';
-export function ProfileKYC() {
+import { useVerification } from './lib/hooks/useVerification';
+import { KYCContactsForm } from './components/KYCContactsForm';
+import { KYCStatus } from './components/KYCStatus';
+export function ProfileKYC({ cardTypeId }: { cardTypeId?: string }) {
   const intl = useIntl();
-  const query = useKYC();
+  const { query, start, active, identityReady, canVerify, verify } = useVerification(cardTypeId);
   const [opened, setOpened] = useState(false);
-  const [submitted, setSubmitted] = useState(false);
   const trigger = useRef<HTMLButtonElement>(null);
   const heading = useRef<HTMLHeadingElement>(null);
-  const saving = useIsMutating({ mutationKey: ['kyc'] }) > 0;
+  const saving = useIsMutating({ mutationKey: ['kyc', 'contacts'] }) > 0;
   return (
     <Stack gap="md">
       <Title ref={heading} tabIndex={-1} order={2} size="h3">
@@ -31,25 +32,40 @@ export function ProfileKYC() {
         </Alert>
       ) : (
         <>
-          <Group>
-            <Text size="sm">
-              <FormattedMessage id="kyc.level" />
+          <KYCStatus state={query.data} />
+          {!identityReady && (
+            <Text size="sm" c="dimmed">
+              <FormattedMessage id={active ? 'kyc.pendingHelp' : 'kyc.help'} />
             </Text>
-            <Badge color={query.data.level === 'KYC_LEVEL_VERIFIED' ? 'green' : 'gray'} variant="light">
-              <FormattedMessage
-                id={query.data.level === 'KYC_LEVEL_VERIFIED' ? 'kyc.verified' : 'kyc.unverified'}
-              />
-            </Badge>
-          </Group>
-          {submitted ? (
-            <Text role="status" size="sm" c="dimmed">
-              <FormattedMessage id="kyc.collected" />
-            </Text>
-          ) : query.data.level === 'KYC_LEVEL_UNVERIFIED' ? (
+          )}
+          {!query.data.contactsComplete && (
             <Button ref={trigger} variant="default" onClick={() => setOpened(true)}>
-              <FormattedMessage id="kyc.start" />
+              <FormattedMessage id="kyc.addContacts" />
             </Button>
-          ) : null}
+          )}
+          {canVerify && (
+            <Button onClick={verify} loading={start.isPending} disabled={query.isFetching || saving}>
+              <FormattedMessage id={active ? 'kyc.continue' : 'kyc.start'} />
+            </Button>
+          )}
+          {!cardTypeId && !canVerify && (
+            <Button component={Link} href="/cabinet/issue" variant="default">
+              <FormattedMessage id="kyc.chooseCard" />
+            </Button>
+          )}
+          {cardTypeId && identityReady && !query.data.contactsComplete && (
+            <Text size="sm">
+              <FormattedMessage id="kyc.finishContacts" />
+            </Text>
+          )}
+          {start.isError && (
+            <Alert color="red" role="alert">
+              <FormattedMessage id="kyc.startError" />
+            </Alert>
+          )}
+          <Button variant="subtle" onClick={() => void query.refetch()} loading={query.isFetching}>
+            <FormattedMessage id="kyc.refresh" />
+          </Button>
         </>
       )}
       <Modal
@@ -58,8 +74,8 @@ export function ProfileKYC() {
           if (!saving) setOpened(false);
         }}
         title={intl.formatMessage({ id: 'kyc.modalTitle' })}
-        size="lg"
         centered
+        size="md"
         closeOnEscape={!saving}
         closeOnClickOutside={!saving}
         closeButtonProps={{
@@ -69,20 +85,7 @@ export function ProfileKYC() {
         returnFocus={false}
         onExitTransitionEnd={() => (trigger.current ?? heading.current)?.focus()}
       >
-        {opened && (
-          <Stack>
-            <Text size="sm" c="dimmed">
-              <FormattedMessage id="kyc.help" />
-            </Text>
-            <KYCForm
-              onSaved={() => {
-                setSubmitted(true);
-                setOpened(false);
-              }}
-              onCancel={() => setOpened(false)}
-            />
-          </Stack>
-        )}
+        {opened && <KYCContactsForm onSaved={() => setOpened(false)} onCancel={() => setOpened(false)} />}
       </Modal>
     </Stack>
   );

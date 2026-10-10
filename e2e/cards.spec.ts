@@ -1,5 +1,8 @@
 import { mkdir } from 'node:fs/promises';
 import { expect, test } from './fixtures/cabinet';
+test.beforeEach(async ({ page }) => {
+  await page.route('**/v1/card-issues/current', (route) => route.fulfill({ json: {} }));
+});
 const card = {
   id: 'stored-card',
   cardTypeId: 'Custom.Card/ABC',
@@ -22,6 +25,7 @@ for (const width of [375, 1440]) {
           categories: {
             'Custom.Card/ABC': {
               name: 'Особая карта',
+              requiresKyc: false,
               palette: { background: '#123456', foreground: '#ffffff' },
               fees: { issue_price: { fixed: '20' }, issue_commission: { fixed: '5' } },
             },

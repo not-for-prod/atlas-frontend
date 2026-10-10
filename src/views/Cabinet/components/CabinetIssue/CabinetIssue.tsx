@@ -4,6 +4,7 @@ import { Badge, Button, Stack, Text, Title } from '@mantine/core';
 import { FormattedMessage } from 'react-intl';
 import { CardVisual, CardTariffTerms, useCardTariff } from '~/entities/card';
 import { StatePanel } from '~/shared/ui/StatePanel';
+import { ProfileKYC } from '~/features/ProfileKYC';
 import { IssueCard } from '~/features/IssueCard';
 import styles from '../../Cabinet.module.css';
 import issueStyles from './CabinetIssue.module.css';
@@ -29,6 +30,7 @@ export function CabinetIssue({
     <Stack>
       <IssueCard
         onLocked={setLocked}
+        verification={<ProfileKYC key={selected} cardTypeId={selected} />}
         category={
           tariff.isSuccess && !tariff.isFetching
             ? tariff.data.categories.find((category) => category.id === selected)
@@ -87,7 +89,12 @@ export function CabinetIssue({
                   <Text size="sm" c="dimmed">
                     {category.description}
                   </Text>
-                  <CardTariffTerms category={category} />
+                  <Stack gap="xs">
+                    <Text size="sm">
+                      <FormattedMessage id={category.requiresKyc ? 'kyc.required' : 'kyc.notRequired'} />
+                    </Text>
+                    <CardTariffTerms category={category} />
+                  </Stack>
                   <Button
                     color="dark"
                     disabled={locked}

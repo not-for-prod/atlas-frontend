@@ -18,6 +18,7 @@ test('tariff failure has no fixture fallback, retry supports empty then live cat
     categories: {
       'Custom.Card/ABC': {
         name: 'Особая карта',
+        requiresKyc: false,
         palette: { background: '#123456', foreground: '#ffffff' },
         description: '<b>Live description</b>',
         fees: { issue: { fixed: '20' }, deposit: { percent: '1.5' } },

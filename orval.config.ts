@@ -9,6 +9,7 @@ export default defineConfig({
     input: target,
     output: {
       mode: 'tags-split',
+      clean: true,
       target: 'src/generated/atlas/client.ts',
       schemas: 'src/generated/atlas/model',
       client: 'react-query',

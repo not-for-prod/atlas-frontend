@@ -36,6 +36,7 @@ export async function getCardTariff(signal?: AbortSignal) {
         !category ||
         typeof category !== 'object' ||
         Array.isArray(category) ||
+        typeof category.requiresKyc !== 'boolean' ||
         (category.name !== undefined &&
           (typeof category.name !== 'string' || [...category.name].length > 256)) ||
         (category.description !== undefined &&
@@ -92,6 +93,7 @@ export async function getCardTariff(signal?: AbortSignal) {
         ...(category.name ? { name: category.name } : {}),
         ...(palette != null ? { palette } : {}),
         description: category.description || '',
+        requiresKyc: category.requiresKyc,
         fees: category.fees,
         ...(limits != null ? { topup: limits } : {}),
       };

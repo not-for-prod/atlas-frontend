@@ -1,0 +1,1 @@
+export { KYCContactsForm } from './KYCContactsForm';

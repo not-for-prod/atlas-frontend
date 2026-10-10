@@ -20,10 +20,13 @@ import type {
 } from '@tanstack/react-query';
 
 import type {
-  AtlasKycV1GetKYCLevelResponse,
-  AtlasKycV1SaveKYCRequest,
-  AtlasKycV1SaveKYCResponse,
-  GoogleRpcStatus
+  AtlasKycV1GetKYCStateResponse,
+  AtlasKycV1SaveKYCContactsRequest,
+  AtlasKycV1SaveKYCContactsResponse,
+  AtlasKycV1StartKYCVerificationRequest,
+  AtlasKycV1StartKYCVerificationResponse,
+  GoogleRpcStatus,
+  KYCServiceGetKYCStateParams
 } from '../model';
 
 import { kyMutator } from '../../../shared/api/kyMutator';
@@ -56,158 +59,43 @@ const withQueryKey = <T extends object, K>(query: T, queryKey: K): T & { queryKe
   return result;
 };
 
-export type kYCServiceSaveKYCResponse200 = {
-  data: AtlasKycV1SaveKYCResponse
+export type kYCServiceGetKYCStateResponse200 = {
+  data: AtlasKycV1GetKYCStateResponse
   status: 200
 }
 
-export type kYCServiceSaveKYCResponseDefault = {
+export type kYCServiceGetKYCStateResponseDefault = {
   data: GoogleRpcStatus
   status: Exclude<HTTPStatusCodes, 200>
 }
 
-export type kYCServiceSaveKYCResponseSuccess = (kYCServiceSaveKYCResponse200) & {
+export type kYCServiceGetKYCStateResponseSuccess = (kYCServiceGetKYCStateResponse200) & {
   headers: Headers;
 };
-export type kYCServiceSaveKYCResponseError = (kYCServiceSaveKYCResponseDefault) & {
+export type kYCServiceGetKYCStateResponseError = (kYCServiceGetKYCStateResponseDefault) & {
   headers: Headers;
 };
 
-export type kYCServiceSaveKYCResponse = (kYCServiceSaveKYCResponseSuccess | kYCServiceSaveKYCResponseError)
+export type kYCServiceGetKYCStateResponse = (kYCServiceGetKYCStateResponseSuccess | kYCServiceGetKYCStateResponseError)
 
-export const getKYCServiceSaveKYCUrl = () => {
+export const getKYCServiceGetKYCStateUrl = (params?: KYCServiceGetKYCStateParams,) => {
+  const normalizedParams = new URLSearchParams();
 
+  Object.entries(params || {}).forEach(([key, value]) => {
 
-
-
-  return `/v1/kyc`
-}
-
-/**
- * @summary SaveKYC replaces collected data without starting or granting verification.
- */
-export const kYCServiceSaveKYC = async (atlasKycV1SaveKYCRequest: AtlasKycV1SaveKYCRequest, options?: RequestInit): Promise<kYCServiceSaveKYCResponse> => {
-
-  return kyMutator<kYCServiceSaveKYCResponse>(getKYCServiceSaveKYCUrl(),
-  {
-    ...options,
-    method: 'PUT',
-    headers: { 'Content-Type': 'application/json', ...options?.headers },
-    body: JSON.stringify(atlasKycV1SaveKYCRequest)
-  }
-);}
-
-
-
-
-
-export const getKYCServiceSaveKYCQueryKey = (atlasKycV1SaveKYCRequest?: BodyType<AtlasKycV1SaveKYCRequest>,) => {
-    return [
-    'PUT', `/v1/kyc`, atlasKycV1SaveKYCRequest
-    ] as const;
+    if (value !== undefined) {
+      normalizedParams.append(key, value === null ? 'null' : String(value))
     }
+  });
 
+  const stringifiedParams = normalizedParams.toString();
 
-export const getKYCServiceSaveKYCQueryOptions = <TData = Awaited<ReturnType<typeof kYCServiceSaveKYC>>, TError = ErrorType<GoogleRpcStatus>>(atlasKycV1SaveKYCRequest: BodyType<AtlasKycV1SaveKYCRequest>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceSaveKYC>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
-) => {
-
-const {query: queryOptions, request: requestOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getKYCServiceSaveKYCQueryKey(atlasKycV1SaveKYCRequest);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof kYCServiceSaveKYC>>> = ({ signal }) => kYCServiceSaveKYC(atlasKycV1SaveKYCRequest, { signal, ...requestOptions });
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof kYCServiceSaveKYC>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+  return stringifiedParams.length > 0 ? `/v1/kyc?${stringifiedParams}` : `/v1/kyc`
 }
 
-export type KYCServiceSaveKYCQueryResult = NonNullable<Awaited<ReturnType<typeof kYCServiceSaveKYC>>>
-export type KYCServiceSaveKYCQueryError = ErrorType<GoogleRpcStatus>
+export const kYCServiceGetKYCState = async (params?: KYCServiceGetKYCStateParams, options?: RequestInit): Promise<kYCServiceGetKYCStateResponse> => {
 
-
-export function useKYCServiceSaveKYC<TData = Awaited<ReturnType<typeof kYCServiceSaveKYC>>, TError = ErrorType<GoogleRpcStatus>>(
- atlasKycV1SaveKYCRequest: BodyType<AtlasKycV1SaveKYCRequest>, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceSaveKYC>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof kYCServiceSaveKYC>>,
-          TError,
-          Awaited<ReturnType<typeof kYCServiceSaveKYC>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof kyMutator>}
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useKYCServiceSaveKYC<TData = Awaited<ReturnType<typeof kYCServiceSaveKYC>>, TError = ErrorType<GoogleRpcStatus>>(
- atlasKycV1SaveKYCRequest: BodyType<AtlasKycV1SaveKYCRequest>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceSaveKYC>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof kYCServiceSaveKYC>>,
-          TError,
-          Awaited<ReturnType<typeof kYCServiceSaveKYC>>
-        > , 'initialData'
-      >, request?: SecondParameter<typeof kyMutator>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useKYCServiceSaveKYC<TData = Awaited<ReturnType<typeof kYCServiceSaveKYC>>, TError = ErrorType<GoogleRpcStatus>>(
- atlasKycV1SaveKYCRequest: BodyType<AtlasKycV1SaveKYCRequest>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceSaveKYC>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary SaveKYC replaces collected data without starting or granting verification.
- */
-
-export function useKYCServiceSaveKYC<TData = Awaited<ReturnType<typeof kYCServiceSaveKYC>>, TError = ErrorType<GoogleRpcStatus>>(
- atlasKycV1SaveKYCRequest: BodyType<AtlasKycV1SaveKYCRequest>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceSaveKYC>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getKYCServiceSaveKYCQueryOptions(atlasKycV1SaveKYCRequest,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return withQueryKey(query, queryOptions.queryKey);
-}
-
-
-
-
-
-
-export type kYCServiceGetKYCLevelResponse200 = {
-  data: AtlasKycV1GetKYCLevelResponse
-  status: 200
-}
-
-export type kYCServiceGetKYCLevelResponseDefault = {
-  data: GoogleRpcStatus
-  status: Exclude<HTTPStatusCodes, 200>
-}
-
-export type kYCServiceGetKYCLevelResponseSuccess = (kYCServiceGetKYCLevelResponse200) & {
-  headers: Headers;
-};
-export type kYCServiceGetKYCLevelResponseError = (kYCServiceGetKYCLevelResponseDefault) & {
-  headers: Headers;
-};
-
-export type kYCServiceGetKYCLevelResponse = (kYCServiceGetKYCLevelResponseSuccess | kYCServiceGetKYCLevelResponseError)
-
-export const getKYCServiceGetKYCLevelUrl = () => {
-
-
-
-
-  return `/v1/kyc/level`
-}
-
-/**
- * @summary GetKYCLevel returns only the caller's server-owned verification level.
- */
-export const kYCServiceGetKYCLevel = async ( options?: RequestInit): Promise<kYCServiceGetKYCLevelResponse> => {
-
-  return kyMutator<kYCServiceGetKYCLevelResponse>(getKYCServiceGetKYCLevelUrl(),
+  return kyMutator<kYCServiceGetKYCStateResponse>(getKYCServiceGetKYCStateUrl(params),
   {
     ...options,
     method: 'GET'
@@ -220,69 +108,292 @@ export const kYCServiceGetKYCLevel = async ( options?: RequestInit): Promise<kYC
 
 
 
-export const getKYCServiceGetKYCLevelQueryKey = () => {
+export const getKYCServiceGetKYCStateQueryKey = (params?: KYCServiceGetKYCStateParams,) => {
     return [
-    `/v1/kyc/level`
+    `/v1/kyc`, ...(params ? [params] : [])
     ] as const;
     }
 
 
-export const getKYCServiceGetKYCLevelQueryOptions = <TData = Awaited<ReturnType<typeof kYCServiceGetKYCLevel>>, TError = ErrorType<GoogleRpcStatus>>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceGetKYCLevel>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+export const getKYCServiceGetKYCStateQueryOptions = <TData = Awaited<ReturnType<typeof kYCServiceGetKYCState>>, TError = ErrorType<GoogleRpcStatus>>(params?: KYCServiceGetKYCStateParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceGetKYCState>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
 ) => {
 
 const {query: queryOptions, request: requestOptions} = options ?? {};
 
-  const queryKey =  queryOptions?.queryKey ?? getKYCServiceGetKYCLevelQueryKey();
+  const queryKey =  queryOptions?.queryKey ?? getKYCServiceGetKYCStateQueryKey(params);
 
 
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof kYCServiceGetKYCLevel>>> = ({ signal }) => kYCServiceGetKYCLevel({ signal, ...requestOptions });
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof kYCServiceGetKYCState>>> = ({ signal }) => kYCServiceGetKYCState(params, { signal, ...requestOptions });
 
 
 
 
 
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof kYCServiceGetKYCLevel>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof kYCServiceGetKYCState>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
 }
 
-export type KYCServiceGetKYCLevelQueryResult = NonNullable<Awaited<ReturnType<typeof kYCServiceGetKYCLevel>>>
-export type KYCServiceGetKYCLevelQueryError = ErrorType<GoogleRpcStatus>
+export type KYCServiceGetKYCStateQueryResult = NonNullable<Awaited<ReturnType<typeof kYCServiceGetKYCState>>>
+export type KYCServiceGetKYCStateQueryError = ErrorType<GoogleRpcStatus>
 
 
-export function useKYCServiceGetKYCLevel<TData = Awaited<ReturnType<typeof kYCServiceGetKYCLevel>>, TError = ErrorType<GoogleRpcStatus>>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceGetKYCLevel>>, TError, TData>> & Pick<
+export function useKYCServiceGetKYCState<TData = Awaited<ReturnType<typeof kYCServiceGetKYCState>>, TError = ErrorType<GoogleRpcStatus>>(
+ params: undefined |  KYCServiceGetKYCStateParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceGetKYCState>>, TError, TData>> & Pick<
         DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof kYCServiceGetKYCLevel>>,
+          Awaited<ReturnType<typeof kYCServiceGetKYCState>>,
           TError,
-          Awaited<ReturnType<typeof kYCServiceGetKYCLevel>>
+          Awaited<ReturnType<typeof kYCServiceGetKYCState>>
         > , 'initialData'
       >, request?: SecondParameter<typeof kyMutator>}
  , queryClient?: QueryClient
   ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useKYCServiceGetKYCLevel<TData = Awaited<ReturnType<typeof kYCServiceGetKYCLevel>>, TError = ErrorType<GoogleRpcStatus>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceGetKYCLevel>>, TError, TData>> & Pick<
+export function useKYCServiceGetKYCState<TData = Awaited<ReturnType<typeof kYCServiceGetKYCState>>, TError = ErrorType<GoogleRpcStatus>>(
+ params?: KYCServiceGetKYCStateParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceGetKYCState>>, TError, TData>> & Pick<
         UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof kYCServiceGetKYCLevel>>,
+          Awaited<ReturnType<typeof kYCServiceGetKYCState>>,
           TError,
-          Awaited<ReturnType<typeof kYCServiceGetKYCLevel>>
+          Awaited<ReturnType<typeof kYCServiceGetKYCState>>
         > , 'initialData'
       >, request?: SecondParameter<typeof kyMutator>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useKYCServiceGetKYCLevel<TData = Awaited<ReturnType<typeof kYCServiceGetKYCLevel>>, TError = ErrorType<GoogleRpcStatus>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceGetKYCLevel>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+export function useKYCServiceGetKYCState<TData = Awaited<ReturnType<typeof kYCServiceGetKYCState>>, TError = ErrorType<GoogleRpcStatus>>(
+ params?: KYCServiceGetKYCStateParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceGetKYCState>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
  , queryClient?: QueryClient
   ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary GetKYCLevel returns only the caller's server-owned verification level.
- */
 
-export function useKYCServiceGetKYCLevel<TData = Awaited<ReturnType<typeof kYCServiceGetKYCLevel>>, TError = ErrorType<GoogleRpcStatus>>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceGetKYCLevel>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+export function useKYCServiceGetKYCState<TData = Awaited<ReturnType<typeof kYCServiceGetKYCState>>, TError = ErrorType<GoogleRpcStatus>>(
+ params?: KYCServiceGetKYCStateParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceGetKYCState>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
  , queryClient?: QueryClient
  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
 
-  const queryOptions = getKYCServiceGetKYCLevelQueryOptions(options)
+  const queryOptions = getKYCServiceGetKYCStateQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export type kYCServiceSaveKYCContactsResponse200 = {
+  data: AtlasKycV1SaveKYCContactsResponse
+  status: 200
+}
+
+export type kYCServiceSaveKYCContactsResponseDefault = {
+  data: GoogleRpcStatus
+  status: Exclude<HTTPStatusCodes, 200>
+}
+
+export type kYCServiceSaveKYCContactsResponseSuccess = (kYCServiceSaveKYCContactsResponse200) & {
+  headers: Headers;
+};
+export type kYCServiceSaveKYCContactsResponseError = (kYCServiceSaveKYCContactsResponseDefault) & {
+  headers: Headers;
+};
+
+export type kYCServiceSaveKYCContactsResponse = (kYCServiceSaveKYCContactsResponseSuccess | kYCServiceSaveKYCContactsResponseError)
+
+export const getKYCServiceSaveKYCContactsUrl = () => {
+
+
+
+
+  return `/v1/kyc/contacts`
+}
+
+export const kYCServiceSaveKYCContacts = async (atlasKycV1SaveKYCContactsRequest: AtlasKycV1SaveKYCContactsRequest, options?: RequestInit): Promise<kYCServiceSaveKYCContactsResponse> => {
+
+  return kyMutator<kYCServiceSaveKYCContactsResponse>(getKYCServiceSaveKYCContactsUrl(),
+  {
+    ...options,
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(atlasKycV1SaveKYCContactsRequest)
+  }
+);}
+
+
+
+
+
+export const getKYCServiceSaveKYCContactsQueryKey = (atlasKycV1SaveKYCContactsRequest?: BodyType<AtlasKycV1SaveKYCContactsRequest>,) => {
+    return [
+    'PUT', `/v1/kyc/contacts`, atlasKycV1SaveKYCContactsRequest
+    ] as const;
+    }
+
+
+export const getKYCServiceSaveKYCContactsQueryOptions = <TData = Awaited<ReturnType<typeof kYCServiceSaveKYCContacts>>, TError = ErrorType<GoogleRpcStatus>>(atlasKycV1SaveKYCContactsRequest: BodyType<AtlasKycV1SaveKYCContactsRequest>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceSaveKYCContacts>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getKYCServiceSaveKYCContactsQueryKey(atlasKycV1SaveKYCContactsRequest);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof kYCServiceSaveKYCContacts>>> = ({ signal }) => kYCServiceSaveKYCContacts(atlasKycV1SaveKYCContactsRequest, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof kYCServiceSaveKYCContacts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type KYCServiceSaveKYCContactsQueryResult = NonNullable<Awaited<ReturnType<typeof kYCServiceSaveKYCContacts>>>
+export type KYCServiceSaveKYCContactsQueryError = ErrorType<GoogleRpcStatus>
+
+
+export function useKYCServiceSaveKYCContacts<TData = Awaited<ReturnType<typeof kYCServiceSaveKYCContacts>>, TError = ErrorType<GoogleRpcStatus>>(
+ atlasKycV1SaveKYCContactsRequest: BodyType<AtlasKycV1SaveKYCContactsRequest>, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceSaveKYCContacts>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof kYCServiceSaveKYCContacts>>,
+          TError,
+          Awaited<ReturnType<typeof kYCServiceSaveKYCContacts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useKYCServiceSaveKYCContacts<TData = Awaited<ReturnType<typeof kYCServiceSaveKYCContacts>>, TError = ErrorType<GoogleRpcStatus>>(
+ atlasKycV1SaveKYCContactsRequest: BodyType<AtlasKycV1SaveKYCContactsRequest>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceSaveKYCContacts>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof kYCServiceSaveKYCContacts>>,
+          TError,
+          Awaited<ReturnType<typeof kYCServiceSaveKYCContacts>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useKYCServiceSaveKYCContacts<TData = Awaited<ReturnType<typeof kYCServiceSaveKYCContacts>>, TError = ErrorType<GoogleRpcStatus>>(
+ atlasKycV1SaveKYCContactsRequest: BodyType<AtlasKycV1SaveKYCContactsRequest>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceSaveKYCContacts>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useKYCServiceSaveKYCContacts<TData = Awaited<ReturnType<typeof kYCServiceSaveKYCContacts>>, TError = ErrorType<GoogleRpcStatus>>(
+ atlasKycV1SaveKYCContactsRequest: BodyType<AtlasKycV1SaveKYCContactsRequest>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceSaveKYCContacts>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getKYCServiceSaveKYCContactsQueryOptions(atlasKycV1SaveKYCContactsRequest,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return withQueryKey(query, queryOptions.queryKey);
+}
+
+
+
+
+
+
+export type kYCServiceStartKYCVerificationResponse200 = {
+  data: AtlasKycV1StartKYCVerificationResponse
+  status: 200
+}
+
+export type kYCServiceStartKYCVerificationResponseDefault = {
+  data: GoogleRpcStatus
+  status: Exclude<HTTPStatusCodes, 200>
+}
+
+export type kYCServiceStartKYCVerificationResponseSuccess = (kYCServiceStartKYCVerificationResponse200) & {
+  headers: Headers;
+};
+export type kYCServiceStartKYCVerificationResponseError = (kYCServiceStartKYCVerificationResponseDefault) & {
+  headers: Headers;
+};
+
+export type kYCServiceStartKYCVerificationResponse = (kYCServiceStartKYCVerificationResponseSuccess | kYCServiceStartKYCVerificationResponseError)
+
+export const getKYCServiceStartKYCVerificationUrl = () => {
+
+
+
+
+  return `/v1/kyc/verification`
+}
+
+export const kYCServiceStartKYCVerification = async (atlasKycV1StartKYCVerificationRequest: AtlasKycV1StartKYCVerificationRequest, options?: RequestInit): Promise<kYCServiceStartKYCVerificationResponse> => {
+
+  return kyMutator<kYCServiceStartKYCVerificationResponse>(getKYCServiceStartKYCVerificationUrl(),
+  {
+    ...options,
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json', ...options?.headers },
+    body: JSON.stringify(atlasKycV1StartKYCVerificationRequest)
+  }
+);}
+
+
+
+
+
+export const getKYCServiceStartKYCVerificationQueryKey = (atlasKycV1StartKYCVerificationRequest?: BodyType<AtlasKycV1StartKYCVerificationRequest>,) => {
+    return [
+    'POST', `/v1/kyc/verification`, atlasKycV1StartKYCVerificationRequest
+    ] as const;
+    }
+
+
+export const getKYCServiceStartKYCVerificationQueryOptions = <TData = Awaited<ReturnType<typeof kYCServiceStartKYCVerification>>, TError = ErrorType<GoogleRpcStatus>>(atlasKycV1StartKYCVerificationRequest: BodyType<AtlasKycV1StartKYCVerificationRequest>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceStartKYCVerification>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+) => {
+
+const {query: queryOptions, request: requestOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getKYCServiceStartKYCVerificationQueryKey(atlasKycV1StartKYCVerificationRequest);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof kYCServiceStartKYCVerification>>> = ({ signal }) => kYCServiceStartKYCVerification(atlasKycV1StartKYCVerificationRequest, { signal, ...requestOptions });
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof kYCServiceStartKYCVerification>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type KYCServiceStartKYCVerificationQueryResult = NonNullable<Awaited<ReturnType<typeof kYCServiceStartKYCVerification>>>
+export type KYCServiceStartKYCVerificationQueryError = ErrorType<GoogleRpcStatus>
+
+
+export function useKYCServiceStartKYCVerification<TData = Awaited<ReturnType<typeof kYCServiceStartKYCVerification>>, TError = ErrorType<GoogleRpcStatus>>(
+ atlasKycV1StartKYCVerificationRequest: BodyType<AtlasKycV1StartKYCVerificationRequest>, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceStartKYCVerification>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof kYCServiceStartKYCVerification>>,
+          TError,
+          Awaited<ReturnType<typeof kYCServiceStartKYCVerification>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useKYCServiceStartKYCVerification<TData = Awaited<ReturnType<typeof kYCServiceStartKYCVerification>>, TError = ErrorType<GoogleRpcStatus>>(
+ atlasKycV1StartKYCVerificationRequest: BodyType<AtlasKycV1StartKYCVerificationRequest>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceStartKYCVerification>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof kYCServiceStartKYCVerification>>,
+          TError,
+          Awaited<ReturnType<typeof kYCServiceStartKYCVerification>>
+        > , 'initialData'
+      >, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useKYCServiceStartKYCVerification<TData = Awaited<ReturnType<typeof kYCServiceStartKYCVerification>>, TError = ErrorType<GoogleRpcStatus>>(
+ atlasKycV1StartKYCVerificationRequest: BodyType<AtlasKycV1StartKYCVerificationRequest>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceStartKYCVerification>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+
+export function useKYCServiceStartKYCVerification<TData = Awaited<ReturnType<typeof kYCServiceStartKYCVerification>>, TError = ErrorType<GoogleRpcStatus>>(
+ atlasKycV1StartKYCVerificationRequest: BodyType<AtlasKycV1StartKYCVerificationRequest>, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof kYCServiceStartKYCVerification>>, TError, TData>>, request?: SecondParameter<typeof kyMutator>}
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getKYCServiceStartKYCVerificationQueryOptions(atlasKycV1StartKYCVerificationRequest,options)
 
   const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 

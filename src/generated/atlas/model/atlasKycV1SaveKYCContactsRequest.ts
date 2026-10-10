@@ -4,8 +4,7 @@
  * authorization/v1/service.proto
  * OpenAPI spec version: version not set
  */
-import type { AtlasKycV1KYCLevel } from './atlasKycV1KYCLevel';
 
-export interface AtlasKycV1GetKYCLevelResponse {
-  level?: AtlasKycV1KYCLevel;
+export interface AtlasKycV1SaveKYCContactsRequest {
+  email?: string;
 }
